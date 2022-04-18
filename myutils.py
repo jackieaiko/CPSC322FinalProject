@@ -8,6 +8,15 @@ def remove_column(data,header,column_name):
     header.pop(col_index)
     return data, header
 
+def get_column(data,header,column_name):
+    col_index = header.index(column_name)
+    col_data = []
+    for row in data:
+        col_data.append(row[col_index])
+        
+    return col_data
+
+
 def get_groups_in_col(data,header,column_name):
     group_labels = []
     col_index = header.index(column_name)
