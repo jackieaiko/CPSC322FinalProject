@@ -63,3 +63,11 @@ def group_by_age(data,header,column_name):
         else:
             print("invalid age")
     return data
+
+def convert_attributes_to_numeric(data,header):
+    for i,col in enumerate(header):
+        labels = get_groups_in_col(data,header,col)
+        for row in data:
+            idx = labels.index(row[i])
+            row[i] = idx
+    return data
