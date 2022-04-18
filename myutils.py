@@ -1,5 +1,5 @@
 from calendar import c
-
+import numpy as np
 
 def remove_column(data,header,column_name):
     col_index = header.index(column_name)
@@ -71,3 +71,14 @@ def convert_attributes_to_numeric(data,header):
             idx = labels.index(row[i])
             row[i] = idx
     return data
+
+def col_pval(p_values, header):
+    new_header = []
+    print("p-values > 0.05")
+    for p_val in range(len(p_values)):
+        if p_values[p_val] > 0.05:
+            print(header[p_val], str(p_values[p_val]))
+            new_header.append(header[p_val])
+
+    return new_header
+    
