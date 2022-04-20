@@ -246,55 +246,34 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
 
     return X_sample, X_out_of_bag, y_sample, y_out_of_bag
 
-
 def confusion_matrix(y_true, y_pred, labels):
     """Compute confusion matrix to evaluate the accuracy of a classification.
-
     Args:
         y_true(list of obj): The ground_truth target y values
             The shape of y is n_samples
         y_pred(list of obj): The predicted target y values (parallel to y_true)
             The shape of y is n_samples
         labels(list of str): The list of all possible target y labels used to index the matrix
-
     Returns:
         matrix(list of list of int): Confusion matrix whose i-th row and j-th column entry
             indicates the number of samples with true label being i-th class
             and predicted label being j-th class
-
     Notes:
         Loosely based on sklearn's confusion_matrix():
             https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
     """
-    # find each possible label combination
-    label_combo = []
-    for i, j in enumerate(labels):
-        label_value = []
-        for k, _ in enumerate(labels):
-            label_value.append([labels[k], j])
-        label_combo.append(label_value)
-
-    # create a list with each combination
-    matrix_values = []
-    for i, _ in enumerate(y_pred):
-        matrix_values.append([y_pred[i], y_true[i]])
-
-    # count each occurence of a label combo
-    matrix_counts = [[[] for _ in labels] for _ in label_combo]
-    for i in matrix_values:
-        for j, _ in enumerate(label_combo):
-            if i in label_combo[j]:
-                val_index = label_combo[j].index(i)
-                matrix_counts[j][val_index].append(1)
-
-    # sum each count
-    matrix = [[] for _ in label_combo]
-    for i, _ in enumerate(matrix_counts):
-        for j in range(len(matrix_counts[i])):
-            matrix[i].append(sum(matrix_counts[i][j]))
-
+    matrix = []
+    for i,label in enumerate(labels):
+        list_val = [0 for l in range(0,len(labels))]
+        for j,y in enumerate(y_true):
+            if y == label:
+                if y_pred[j] == y:
+                    list_val[i] +=1
+                else:
+                    idx = labels.index(y_pred[j])
+                    list_val[idx] +=1
+        matrix.append(list_val)
     return matrix
-
 
 def accuracy_score(y_true, y_pred, normalize=True):
     """Compute the classification prediction accuracy score.
