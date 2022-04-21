@@ -116,23 +116,23 @@ class MyKNeighborsClassifier:
             neighbor_indices(list of list of int): 2D list of k nearest neighbor
                 indices in X_train (parallel to distances)
         """
-        row_indexes_dists = []
-        for i, train_instance in enumerate(self.X_train):
-            dist = myutils.compute_euclidean_distance(train_instance, X_test)
-            row_indexes_dists.append([i, dist])
-
-        row_indexes_dists.sort(key=operator.itemgetter(-1))
-
-        k = self.n_neighbors
-        top_k = row_indexes_dists[:k]
-
         distances = []
         neighbor_indices = []
-        for row in top_k:
-            neighbor_indices.append(row[0])
-            distances.append(float("{:.2f}".format(row[1])))
-
-        return distances, neighbor_indices
+        for test in X_test:
+            top_distance = []
+            top_indices = []
+            row_indexes_dists = []
+            for i, train_instance in enumerate(self.X_train):
+                dist = myutils.compute_euclidean_distance(train_instance,test)
+                row_indexes_dists.append([i, dist])
+            row_indexes_dists.sort(key=operator.itemgetter(-1)) # -1 or 1
+            top_k = row_indexes_dists[:self.n_neighbors]
+            for row in top_k:
+                top_distance.append(row[1])
+                top_indices.append(row[0])
+            distances.append(top_distance)
+            neighbor_indices.append(top_indices)
+        return distances,neighbor_indices
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -144,8 +144,26 @@ class MyKNeighborsClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
+        y_predicted = []
+        res = self.kneighbors(X_test)
+        for indices in res[1]:
+            class_label = []
+            class_freq = []
+            #for each X_test value
+            for index in indices:
+                val = self.y_train[index]
+                if val not in class_label:
+                    class_label.append(val)
+                    class_freq.append(1)
+                else:
+                    idx = class_label.index(val)
+                    class_freq[idx] +=1
+            max_freq_label = myutils.find_max(class_label,class_freq)
+            y_predicted.append([max_freq_label])
+        
+        return y_predicted
+        """
         distances, neighbor_indices = self.kneighbors(X_test)
-
         k_closest = []
         for i in neighbor_indices:
             k_closest.append(self.y_train[i])
@@ -159,7 +177,7 @@ class MyKNeighborsClassifier:
                 max_val = counts[i]
                 y_predicted = str(values[i])
 
-        return [y_predicted]
+        return [y_predicted]"""
 
 
 class MyDummyClassifier:
@@ -222,22 +240,18 @@ class MyDummyClassifier:
         # ex. 4 yes's  if X_test =  [[] [] [] []] no matter contents
         return y_predicted
 
-
 class MyNaiveBayesClassifier:
     """Represents a Naive Bayes classifier.
-
     Attributes:
         priors(YOU CHOOSE THE MOST APPROPRIATE TYPE): The prior probabilities computed for each
             label in the training set.
         posteriors(YOU CHOOSE THE MOST APPROPRIATE TYPE): The posterior probabilities computed for each
             attribute value/label pair in the training set.
-
     Notes:
         Loosely based on sklearn's Naive Bayes classifiers: https://scikit-learn.org/stable/modules/naive_bayes.html
         You may add additional instance attributes if you would like, just be sure to update this docstring
         Terminology: instance = sample = row and attribute = feature = column
     """
-
     def __init__(self):
         """Initializer for MyNaiveBayesClassifier.
         """
@@ -246,95 +260,79 @@ class MyNaiveBayesClassifier:
 
     def fit(self, X_train, y_train):
         """Fits a Naive Bayes classifier to X_train and y_train.
-
         Args:
             X_train(list of list of obj): The list of training instances (samples)
                 The shape of X_train is (n_train_samples, n_features)
             y_train(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
-
         Notes:
             Since Naive Bayes is an eager learning algorithm, this method computes the prior probabilities
                 and the posterior probabilities for the training data.
             You are free to choose the most appropriate data structures for storing the priors
                 and posteriors.
         """
-        y_train_priors = y_train.copy()
-        # find priors
-        self.priors = {}
-        c_i, priors = myutils.get_frequencies(y_train_priors)
-        for i in c_i:
-            value = priors[c_i.index(i)] / len(y_train_priors)
-            self.priors[i] = float("{:.2f}".format(value))
+        distinct_labels,freqs = myutils.get_labels(y_train)
+        priors ={}
+        posteriors = []
+        initialize_dict = {}
+        for i,label in enumerate(distinct_labels):
+            prob = round(freqs[i] / sum(freqs),3)
+            priors.update({label:prob})
+            initialize_dict.update({label:0.0})
 
-        # find frequency values of each
-        c_i_cat_key = [[] for _ in c_i]
-        c_i_cat_value = []
-        for j in c_i:
-            for i in range(len(X_train[0])):
-                cur_col = myutils.find_column(X_train, y_train, i, j)
-                compare_col = myutils.find1_column(X_train, i)
-
-                a_h, posteriors = myutils.get_frequencies(cur_col)
-                # for when frequency is 0
-                for l in compare_col:
-                    if l not in a_h:
-                        a_h.append(l)
-                        posteriors.append(0)
-
-                c_i_cat_key[c_i.index(j)].append(posteriors)
-                if c_i.index(j) == 0:
-                    c_i_cat_value.append(a_h)
-
-        # create dictionary
-        att_names = list(range(len(X_train[0])))
-        new_dict = {}
-        for i in c_i:
-            new_dict[i] = {}
-            for j in att_names:
-                new_dict[i][j] = {}
-
-        # fill dictionary
-        for i, _ in enumerate(att_names):
-            for j in c_i:
-                for k in c_i_cat_value[i]:
-                    value = c_i_cat_key[c_i.index(
-                        j)][i][c_i_cat_value[i].index(k)] / priors[c_i.index(j)]
-                    new_dict[j][att_names[i]][k] = float(
-                        "{:.2f}".format(value))
-
-        self.posteriors = new_dict
+        for elem in enumerate(X_train[0]):
+            index = elem[0]
+            #get all vals of att_x
+            column = myutils.get_column(X_train,index)
+            posteriors.append({})
+            #seperate att_x into its y_labels
+            all_labels = []
+            for i,label in enumerate(distinct_labels):
+                label_col = []
+                for j,row in enumerate(column):
+                    if y_train[j] == label:
+                        label_col.append(row)
+                distinct_att_label, freq_att = myutils.get_labels(label_col)
+                for k,att_label in enumerate(distinct_att_label):
+                    if att_label not in all_labels:
+                        all_labels.append(att_label)
+                        new_dict_entry= {}
+                        curr_dict = dict(initialize_dict)
+                        curr_dict[label] = round(freq_att[k] / freqs[i],3)
+                        new_dict_entry.update({att_label:curr_dict})
+                        posteriors[index].update(new_dict_entry)
+                    else:
+                        posteriors[index][att_label][label] = round(freq_att[k] / freqs[i],3)
+        self.priors = priors
+        self.posteriors = posteriors
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
-
         Args:
             X_test(list of list of obj): The list of testing samples
                 The shape of X_test is (n_test_samples, n_features)
-
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-
-        decisions = []
-        label_tracker = []
-        for i, _ in enumerate(X_test):
-            decision = []
-            for label in self.posteriors:
-                label_tracker.append(label)
-                label_prediction = self.priors[label]
-                for class_type in self.posteriors[label]:
-                    label_prediction *= self.posteriors[label][class_type][X_test[i][class_type]]
-                decision.append(float("{:.4f}".format(label_prediction)))
-            decisions.append(decision)
-
         y_predicted = []
-        for i in decisions:
-            loc = i.index(max(i))
-            y_predicted.append(label_tracker[loc])
+
+        for row in X_test:
+            keys = self.priors.keys()
+            #[yes,no]
+            max_key = ""
+            max_key_val = 0.0
+            for key in keys:
+                curr_key_val = 1.0
+                #[1,2]
+                for i,col in enumerate(row):
+                    curr_key_val *= self.posteriors[i][col][key]
+                curr_key_val *= self.priors[key]
+                if curr_key_val > max_key_val:
+                    max_key_val = curr_key_val
+                    max_key = key
+            y_predicted.append([max_key])
 
         return y_predicted
-
 
 class MyDecisionTreeClassifier:
     """Represents a decision tree classifier.
@@ -399,7 +397,7 @@ class MyDecisionTreeClassifier:
         header = X_train.pop(0)
         for test in X_test:
             prediction = myutils.recurse_tree(test, "", self.tree, header)
-            y_predicted.append(prediction)
+            y_predicted.append([prediction])
         return y_predicted
 
     def print_decision_rules(self, attribute_names=None, class_name="class"):

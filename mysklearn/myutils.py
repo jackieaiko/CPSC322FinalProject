@@ -21,12 +21,47 @@ def compute_euclidean_distance(v1, v2):
     Returns:
         dist: distances for each instance
     """
-    if type(v1[0]) == str:  # is a string
-        dist = np.sqrt(sum(1 if v1[i] == v2[i] else 0 for i in range(len(v1))))
-    else:
-        dist = np.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
+    dist = 0
+    for idx_and_elem in enumerate(v1):
+        i = idx_and_elem[0]
+        if isinstance(v1[i], str):
+            if v1[i] != v2[i]:
+                dist +=1
+        else:
+            dist += (v1[i] - v2[i])**2
+    return np.sqrt(dist)
 
-    return dist
+def get_labels(list_of_val):
+    """ returns unique values as labels and their freq
+        Args:
+            list_of_val(list of str): list of values
+        Returns:
+            label(list of str): list of unique values as labels
+            freq(list of int): frequency of the unique val parallel to labels
+    """
+    label = []
+    freq = []
+    for val in list_of_val:
+        if val in label:
+            idx = label.index(val)
+            freq[idx] +=1
+        else:
+            label.append(val)
+            freq.append(1)
+    return label, freq
+
+def get_column(X,index):
+    """ returns the column given the index
+        Args:
+            X(list of list of str): 2D table
+            index(int): integer of index
+        Returns:
+            col(list of str): the particular column at the index of the table
+    """
+    col = []
+    for rows in X:
+        col.append(rows[index])
+    return col
 
 
 def get_frequencies(col):
@@ -392,3 +427,19 @@ def equal_trees(tree1,tree2):
                     if is_true is False:
                         return False
     return True
+
+def find_max(label,freqs):
+    """ find max finds the label associated with the highest frequency given a list of frequencies
+        Args:
+            label(list of str): list of labels
+            freqs(list of int): frequency of each label(parallel to labels)
+        Returns:
+            max_label(str): label of the highest frequency
+    """
+    max_f = 0
+    max_label = ""
+    for i,freq in enumerate(freqs):
+        if freq > max_f:
+            max_f = freq
+            max_label = label[i]
+    return max_label
