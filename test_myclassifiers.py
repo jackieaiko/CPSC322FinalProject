@@ -250,23 +250,64 @@ X_train_interview = [
 y_train_interview = ["False", "False", "True", "True", "True", "False", "True",
                      "False", "True", "True", "True", "True", "True", "False"]
 
-
 def test_decision_tree_classifier_fit():
-    """tests fit function from MyDecisionTreeClassifier
-    """
-    decision_tree = MyDecisionTreeClassifier()
-    decision_tree.fit(X_train_interview, y_train_interview,
-                      len(X_train_interview[0]))
+    # interview dataset
+    interview_header = ["level", "lang", "tweets", "phd", "interviewed_well"]
+    interview_table = [
+            ["Senior", "Java", "no", "no", "False"],
+            ["Senior", "Java", "no", "yes", "False"],
+            ["Mid", "Python", "no", "no", "True"],
+            ["Junior", "Python", "no", "no", "True"],
+            ["Junior", "R", "yes", "no", "True"],
+            ["Junior", "R", "yes", "yes", "False"],
+            ["Mid", "R", "yes", "yes", "True"],
+            ["Senior", "Python", "no", "no", "False"],
+            ["Senior", "R", "yes", "no", "True"],
+            ["Junior", "Python", "yes", "no", "True"],
+            ["Senior", "Python", "yes", "yes", "True"],
+            ["Mid", "Python", "no", "yes", "True"],
+            ["Mid", "Java", "yes", "no", "True"],
+            ["Junior", "Python", "no", "yes", "False"]
+        ]
 
-    tree_job = \
-        
-    assert tree_job == decision_tree.tree
+    # note: this tree uses the generic "att#" attribute labels because fit() does not and should not accept attribute names
+    # note: the attribute values are sorted alphabetically
+    interview_tree = \
+            ["Attribute", "level",
+                ["Value", "Junior", 
+                    ["Attribute", "phd",
+                        ["Value", "no", 
+                            ["Leaf", "True", 3, 5]
+                        ],
+                        ["Value", "yes", 
+                            ["Leaf", "False", 2, 5]
+                        ]
+                    ]
+                ],
+                ["Value", "Mid",
+                    ["Leaf", "True", 4, 14]
+                ],
+                ["Value", "Senior",
+                    ["Attribute", "tweets",
+                        ["Value", "no",
+                            ["Leaf", "False", 3, 5]
+                        ],
+                        ["Value", "yes",
+                            ["Leaf", "True", 2, 5]
+                        ]
+                    ]
+                ]
+            ]
+    tree_classifier = MyDecisionTreeClassifier()
+    interview_table.insert(0,interview_header)
+    intw_y_train = [interview_table[i][-1] for i in range(len(interview_table))]
+    intw_x_train = [interview_table[i][:-1] for i in range(len(interview_table))]
 
+    tree_classifier.fit(intw_x_train,intw_y_train)
 
-decision_tree = MyDecisionTreeClassifier()
-decision_tree.fit(X_train_interview, y_train_interview,
-                  len(X_train_interview[0]))
-print(decision_tree.tree)
+    #check if tree is correct or not
+    assert myutils.equal_trees(tree_classifier.tree,interview_tree) is True
+
 
 # knn problem
 # decision tree incorrect

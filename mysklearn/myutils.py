@@ -349,6 +349,7 @@ def recurse_tree(x_val, att_val, tree, header):
         if att_val != "":
             tree = tree[2]
         if tree[0] == "Attribute":
+            print("hedaer ere",header,"tree_i",tree[1])
             index = header.index(tree[1])
             att_val = x_val[index]
             for i in range(2, len(tree)):
