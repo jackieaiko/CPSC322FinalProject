@@ -57,7 +57,7 @@ y = ["False", "False", "True", "True", "True", "False", "True",
 # M: most accurate trees of N trees
 # F: number of the remaining attributes that are candidates to partition on
 
-table = [X[i] + [y[i]] for i in range(len(X))]
+
 # step 1: use strat cross validation to split test and train set
 
 # step 2:
@@ -76,17 +76,12 @@ table = [X[i] + [y[i]] for i in range(len(X))]
 
 
 # split = third of size of dataset
-n_splits = round(len(X)/3)
-train_folds, test_folds = myevaluation.stratified_kfold_cross_validation(
-    X, y, n_splits=n_splits)
 
-test_set = []
-remainder = []
-for i in train_folds[0]:
-    remainder.append(X[i] + [y[i]])
-for i in test_folds[0]:
-    test_set.append(X[i] + [y[i]])
-
+X_train, y_train, X_test, y_test = myevaluation.train_test_split(X, y)
+print(y_train)
+print(y_test)
+test_set = [X_test[i] + [y_test[i]] for i in range(len(X_test))]
+remainder = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
 
 n = 4
 f = 3
