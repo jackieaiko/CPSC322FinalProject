@@ -379,7 +379,7 @@ class MyDecisionTreeClassifier:
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         train.pop(0)
         header = X_train.pop(0)
-        print("eader",header)
+        print("eader", header)
         available_att = header.copy()
         available_atts = myutils.compute_random_subset(available_att, f)
         att_domains = myutils.get_attribute_domains(header, X_train)
@@ -461,15 +461,15 @@ class MyRandomForestClassifier:
     def __init__(self, n, m, f):
         """Initializer for MyDecisionTreeClassifier.
         """
-        self.X_train = None
-        self.y_train = None
-        self.forest = None
+        self.remainder_set = None
+        self.test_set = None
+        self.m_forest = None
 
         self.n = n
         self.m = m
         self.f = f
 
-    def fit(self, X_train, y_train):
+    def fit(self, remainder_set, test_set):
         """Fits a decision random forest classifier 
         Args:
             X_train(list of list of obj): The list of training instances (samples).
@@ -477,6 +477,7 @@ class MyRandomForestClassifier:
             y_train(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
         """
+
         pass
 
     def predict(self, X_test):
