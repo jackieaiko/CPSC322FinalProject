@@ -59,24 +59,26 @@ y_train_class_example2 = ["no", "yes",
 # print(funct_indices)
 
 
-# def test_kneighbors_classifier_predict():
+def test_kneighbors_classifier_predict():
 #     """tests predict function from MyKNeighborsClassifier
 #     """
-#     function_kpredict = MyKNeighborsClassifier()
+    function_kpredict = MyKNeighborsClassifier()
 
-#     X_test = [0.33, 1]
-#     test_y_predicted = ["good"]
+    X_test = [[0.33, 1]]
+    test_y_predicted = ["good"]
 
-#     function_kpredict.fit(X_train_class_example1, y_train_class_example1)
-#     y_predicted = function_kpredict.predict(X_test)
-#     assert y_predicted == test_y_predicted
+    function_kpredict.fit(X_train_class_example1, y_train_class_example1)
+    y_predicted = function_kpredict.predict(X_test)
+    for y in y_predicted:
+        assert y == test_y_predicted
 
-#     X_test = [2, 3]
-#     test_y_predicted = ["yes"]
+    X_test = [[2, 3]]
+    test_y_predicted = ["yes"]
 
-#     function_kpredict.fit(X_train_class_example2, y_train_class_example2)
-#     y_predicted = function_kpredict.predict(X_test)
-#     assert y_predicted == test_y_predicted
+    function_kpredict.fit(X_train_class_example2, y_train_class_example2)
+    y_predicted = function_kpredict.predict(X_test)
+    for y in y_predicted:
+        assert y == test_y_predicted
 
 
 def test_dummy_classifier_fit():
@@ -257,21 +259,7 @@ def test_decision_tree_classifier_fit():
                       len(X_train_interview[0]))
 
     tree_job = \
-        ['Attribute', 'att0',
-         ['Value', 'Senior',
-          ['Attribute', 'att2',
-           ['Value', 'no',
-            ['Leaf', 'False', 3, 5]],
-           ['Value', 'yes',
-            ['Leaf', 'True', 2, 5]]]],
-         ['Value', 'Mid',
-          ['Leaf', 'True', 4, 14]],
-         ['Value', 'Junior',
-          ['Attribute', 'att3',
-           ['Value', 'no',
-            ['Leaf', 'True', 3, 5]],
-           ['Value', 'yes',
-            ['Leaf', 'False', 2, 5]]]]]
+        
     assert tree_job == decision_tree.tree
 
 

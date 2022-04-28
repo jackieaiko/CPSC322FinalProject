@@ -4,7 +4,6 @@ import mysklearn.myevaluation as myevaluation
 from mysklearn import myutils
 import numpy as np
 
-
 def compute_bootstrapped_sample(table):
     n = len(table)
     train_set = []
