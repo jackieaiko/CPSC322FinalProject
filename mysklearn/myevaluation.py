@@ -59,6 +59,7 @@ def train_test_split(X, y, test_size=0.33, random_state=None, shuffle=True):
     for i, _ in enumerate(y):
         if i not in test_instance_indices:
             y_train.append(y[i])
+    print(y_train)
 
     y_test = []
     for i in test_instance_indices:
@@ -246,6 +247,7 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
 
     return X_sample, X_out_of_bag, y_sample, y_out_of_bag
 
+
 def confusion_matrix(y_true, y_pred, labels):
     """Compute confusion matrix to evaluate the accuracy of a classification.
     Args:
@@ -263,17 +265,18 @@ def confusion_matrix(y_true, y_pred, labels):
             https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
     """
     matrix = []
-    for i,label in enumerate(labels):
-        list_val = [0 for l in range(0,len(labels))]
-        for j,y in enumerate(y_true):
+    for i, label in enumerate(labels):
+        list_val = [0 for l in range(0, len(labels))]
+        for j, y in enumerate(y_true):
             if y == label:
                 if y_pred[j] == y:
-                    list_val[i] +=1
+                    list_val[i] += 1
                 else:
                     idx = labels.index(y_pred[j])
-                    list_val[idx] +=1
+                    list_val[idx] += 1
         matrix.append(list_val)
     return matrix
+
 
 def accuracy_score(y_true, y_pred, normalize=True):
     """Compute the classification prediction accuracy score.

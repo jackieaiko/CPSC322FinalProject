@@ -4,6 +4,7 @@ import mysklearn.myevaluation as myevaluation
 from mysklearn import myutils
 import numpy as np
 
+
 def compute_bootstrapped_sample(table):
     n = len(table)
     train_set = []
@@ -76,9 +77,7 @@ y = ["False", "False", "True", "True", "True", "False", "True",
 
 # split = third of size of dataset
 
-X_train, y_train, X_test, y_test = myevaluation.train_test_split(X, y)
-print(y_train)
-print(y_test)
+X_train, X_test, y_train, y_test = myevaluation.train_test_split(X, y)
 test_set = [X_test[i] + [y_test[i]] for i in range(len(X_test))]
 remainder = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
 
@@ -109,11 +108,11 @@ print(m_forest)
 
 # predicted_forests = []
 # # for i in range(m):
-# tree = m_forest[1]
+tree = m_forest[1].copy()
 
-# y_predicted = []
-# remainder = remainder.copy()
-# header = remainder.pop(0)
-# for test in X_test:
-#     prediction = myutils.recurse_tree(test, "", tree, header)
-#     y_predicted.append([prediction])
+y_predicted = []
+remainder = remainder.copy()
+header = remainder.pop(0)
+for test in X_test:
+    prediction = myutils.recurse_tree(test, "", tree, header)
+    y_predicted.append([prediction])
