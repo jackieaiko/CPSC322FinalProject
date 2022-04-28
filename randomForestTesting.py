@@ -90,9 +90,9 @@ n_performance = []
 header = ["level", "lang", "tweets", "phd"]
 for i in range(n):
     X_train, y_train, X_test, y_test = compute_bootstrapped_sample(remainder)
-    #X_train.insert(0,header)
-    #print("Xtrain",X_train)
-    #y_train.insert(0,"interviewed_well")
+    # X_train.insert(0,header)
+    # print("Xtrain",X_train)
+    # y_train.insert(0,"interviewed_well")
     decision_tree_classifier = MyDecisionTreeClassifier()
     decision_tree_classifier.fit(X_train, y_train, f)
 
@@ -113,12 +113,21 @@ print(m_forest)
 # # for i in range(m):
 tree = m_forest[1].copy()
 
+# y_predicted = []
+# remainder = remainder.copy()
+# print("remainder", remainder)
+# #header = remainder.pop(0)
+# for test in X_test:
+#     prediction = myutils.recurse_tree(test, "", tree, header)
+#     y_predicted.append([prediction])
+# print(X_test)
+# print(y_predicted)
+header = []
+for header_len in range(len(test_set[0])):
+    header.append("att" + str(header_len))
+
 y_predicted = []
-remainder = remainder.copy()
-print("remainder",remainder)
-#header = remainder.pop(0)
-for test in X_test:
-    prediction = myutils.recurse_tree(test, "", tree, header)
-    y_predicted.append([prediction])
-print(X_test)
+for instance in test_set:
+    predicted = myutils.tdidt_predict(header, tree, instance)
+    y_predicted.append(predicted)
 print(y_predicted)

@@ -375,23 +375,12 @@ class MyDecisionTreeClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
-        self.X_train = X_train.copy()
-        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        #train.pop(0)
-        #header = X_train.pop(0)
-        #print("eader", header)
-        header = []
-        for i in range(0,len(X_train[0])):
-            header.append("att"+str(i))
-        available_att = header.copy()
-        available_atts = myutils.compute_random_subset(available_att, f)
-        att_domains = myutils.get_attribute_domains(header, X_train)
+        self.X_train = X_train
         self.y_train = y_train
-        # next, make a copy of your header .... tdidt() is going to modify the list
-        # also recall: python is pass by object reference
-        tree = myutils.tdidt(train, available_atts,
-                             header, att_domains, X_train)
-        self.tree = tree
+        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        available_attributes = list(range(len(train[0])-1))
+        available_atts = myutils.compute_random_subset(available_attributes, f)
+        self.tree = myutils.tdidt(train, available_atts, X_train)
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -401,12 +390,15 @@ class MyDecisionTreeClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
+        header = []
+        for header_len in range(len(X_test[0])):
+            header.append("att" + str(header_len))
+
         y_predicted = []
-        X_train = self.X_train.copy()
-        header = X_train.pop(0)
-        for test in X_test:
-            prediction = myutils.recurse_tree(test, "", self.tree, header)
-            y_predicted.append([prediction])
+        for instance in X_test:
+            predicted = myutils.tdidt_predict(header, self.tree, instance)
+            y_predicted.append(predicted)
+
         return y_predicted
 
     def print_decision_rules(self, attribute_names=None, class_name="class"):

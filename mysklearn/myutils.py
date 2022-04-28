@@ -131,231 +131,231 @@ def find1_column(X_train, col_index):
     return col
 
 
-def select_attribute(instances, attributes, header, X_train):
-    """chooses the attribute to split on based on entropy value
-        Args:
-            instances (list of list of str/int) : represent the instances in this split
-            attributes (list of str): attributes to split on
-            header (list of str): header of the table
-            X_train (list of list of str/int): represent the orignal X dataset
-        Returns:
-            split_att(str): attribute to split on
-        Notes:
-            entropy value calculated
-        """
-    split_att = attributes[0]
-    split_att_ent = 500
-    for att in attributes:
-        index = header.index(att)
-        labels = []
-        labels_indexes = []
-        total_ent = 0
-        for i, instance in enumerate(instances):
-            if instance[index] not in labels:
-                labels.append(instance[index])
-                labels_indexes.append([i])
-            else:
-                i_labels = labels.index(instance[index])
-                labels_indexes[i_labels].append(i)
-        for label_indexes in labels_indexes:
-            class_labels = []
-            class_freq = []
-            for elem_index in label_indexes:
-                if instances[elem_index][-1] not in class_labels:
-                    class_labels.append(instances[elem_index][-1])
-                    class_freq.append(1)
-                else:
-                    idx = class_labels.index(instances[elem_index][-1])
-                    class_freq[idx] += 1
-            sums = 0
-            for label_idx, class_label in enumerate(class_labels):
-                val = class_freq[label_idx]/len(label_indexes)
-                sums += (-val) * (math.log2(val))
-            total_ent += (len(label_indexes) / len(X_train)) * sums
-        if total_ent < split_att_ent:
-            split_att_ent = total_ent
-            split_att = att
-    return split_att
+# def select_attribute(instances, attributes, header, X_train):
+#     """chooses the attribute to split on based on entropy value
+#         Args:
+#             instances (list of list of str/int) : represent the instances in this split
+#             attributes (list of str): attributes to split on
+#             header (list of str): header of the table
+#             X_train (list of list of str/int): represent the orignal X dataset
+#         Returns:
+#             split_att(str): attribute to split on
+#         Notes:
+#             entropy value calculated
+#         """
+#     split_att = attributes[0]
+#     split_att_ent = 500
+#     for att in attributes:
+#         index = header.index(att)
+#         labels = []
+#         labels_indexes = []
+#         total_ent = 0
+#         for i, instance in enumerate(instances):
+#             if instance[index] not in labels:
+#                 labels.append(instance[index])
+#                 labels_indexes.append([i])
+#             else:
+#                 i_labels = labels.index(instance[index])
+#                 labels_indexes[i_labels].append(i)
+#         for label_indexes in labels_indexes:
+#             class_labels = []
+#             class_freq = []
+#             for elem_index in label_indexes:
+#                 if instances[elem_index][-1] not in class_labels:
+#                     class_labels.append(instances[elem_index][-1])
+#                     class_freq.append(1)
+#                 else:
+#                     idx = class_labels.index(instances[elem_index][-1])
+#                     class_freq[idx] += 1
+#             sums = 0
+#             for label_idx, class_label in enumerate(class_labels):
+#                 val = class_freq[label_idx]/len(label_indexes)
+#                 sums += (-val) * (math.log2(val))
+#             total_ent += (len(label_indexes) / len(X_train)) * sums
+#         if total_ent < split_att_ent:
+#             split_att_ent = total_ent
+#             split_att = att
+#     return split_att
 
 
-def partition_instances(instances, split_atribute, header, attribute_domains):
-    """group the instances together
-        Args:
-            instances (list of list of str/int) : represent the instances in this split
-            split_attribute(str): attribute to group instances
-            header (list of str): header of the table
-            attribute_domains (list of str): attribute domains of that attrubute
-        partitions (dictionary): attribute domain as key and instances as values
-     """
-    # lets use a dictionary
-    partitions = {}  # key string mapping to subvalue pairs
-    att_index = header.index(split_atribute)  # e.g: 0 for level
-    # e.g: ["Junior","Mid","Senior"]
-    att_domain = attribute_domains[split_atribute]
-    for att_val in att_domain:
-        partitions[att_val] = []
-        for instance in instances:
-            if instance[att_index] == att_val:
-                partitions[att_val].append(instance)
+# def partition_instances(instances, split_atribute, header, attribute_domains):
+#     """group the instances together
+#         Args:
+#             instances (list of list of str/int) : represent the instances in this split
+#             split_attribute(str): attribute to group instances
+#             header (list of str): header of the table
+#             attribute_domains (list of str): attribute domains of that attrubute
+#         partitions (dictionary): attribute domain as key and instances as values
+#      """
+#     # lets use a dictionary
+#     partitions = {}  # key string mapping to subvalue pairs
+#     att_index = header.index(split_atribute)  # e.g: 0 for level
+#     # e.g: ["Junior","Mid","Senior"]
+#     att_domain = attribute_domains[split_atribute]
+#     for att_val in att_domain:
+#         partitions[att_val] = []
+#         for instance in instances:
+#             if instance[att_index] == att_val:
+#                 partitions[att_val].append(instance)
 
-    return partitions
-
-
-def majority_node(instances):
-    """the class value that most instances have
-        Args:
-            instances (list of list of str/int) : represent the instances in this split
-        Returns:
-            label(str): most occuring/frequent class label of the instances
-    """
-    labels = []
-    freqs = []
-    for instance in instances:
-        if instance[-1] not in labels:
-            labels.append(instance[-1])
-            freqs.append(1)
-        else:
-            i = labels.index(instance[-1])
-            freqs[i] += 1
-    min = 100
-    min_index = -1
-    for i, freq in enumerate(freqs):
-        if freq < min:
-            min = freq
-            min_index = i
-        elif freq == min:
-            if labels[min_index] > labels[i]:
-                min_index = i
-    return labels[min_index]
+#     return partitions
 
 
-def get_attribute_domains(header, table):
-    """returns the attribute domains in each attribute in alphabetical order
-        Args:
-            table (list of list of str/int) : represent the whole dataset table
-            header (list of str): header of the table
-        Returns:
-            dict_domains(dictionary): list of attributes as keys and and its domains as values
-    """
-    dict_domains = {}
-    arr_vals = []
-    for i, elem in enumerate(header):
-        arr_vals = []
-        for row in table:
-            if row[i] not in arr_vals:
-                arr_vals.append(row[i])
-        arr_vals.sort()
-        dict_domains.update({elem: arr_vals})
-
-    return dict_domains
-
-
-def tdidt(current_instances, available_attributes, header, attribute_domains, X_train):
-    """responsible for fitting the dataset into a tree using the tdidt algorithmn, will decide how to split into a tree
-        Args:
-            current_instances (list of list of str/int) : represent the instances in this split
-            available_attributes (list of str): attributes that can still be split on
-            header (list of str): header of the table
-            attribute_domains (dictionary): attribute domains for all the attributes
-            X_train (list of list of str/int): represent the orignal X dataset
-        Returns:
-            tree(N-D array of list or int): tree represented in nested lists
-    """
-    # basic approach (uses recursion!!):
-    # select an attribute to split on
-    attribute = select_attribute(
-        current_instances, available_attributes, header, X_train)
-    #print("split on:",attribute)
-    # remove split att
-    available_attributes.remove(attribute)
-    tree = ["Attribute", attribute]
-    # group data by attribute domains (creates pairwise disjoint partitions)
-    partition = partition_instances(
-        current_instances, attribute, header, attribute_domains)
-    # for each partition, repeat unless one of the following occurs (base case)
-    for att_val, att_partition in partition.items():
-        value_subtree = ["Value", att_val]
-    #   CASE 1: all class labels of the partition are the same => make a leaf node
-        if len(att_partition) > 0 and all_same_class(att_partition):
-            #print("CASE 1, ALL SAME CATEGORIES")
-            node = ["Leaf", att_partition[0][-1],
-                    len(att_partition), len(current_instances)]
-            value_subtree.append(node)
-            tree.append(value_subtree)
-        #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
-        elif len(att_partition) > 0 and len(available_attributes) == 0:
-            #print("CASE 2, NO MORE ATT")
-            node_val = majority_node(att_partition)
-            node = ["Leaf", node_val, len(
-                att_partition), len(current_instances)]
-            value_subtree.append(node)
-            tree.append(value_subtree)
-        #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
-        elif len(att_partition) == 0:
-            #print("CASE 3 empty partition")
-            return None
-        else:
-            subtree = tdidt(att_partition, available_attributes.copy(
-            ), header, attribute_domains, X_train)
-            if subtree is None:
-                val = 0
-                node_val = majority_node(att_partition)
-                for rows in att_partition:
-                    if rows[-1] == node_val:
-                        val += 1
-                subtree = ["Leaf", node_val, len(
-                    att_partition), len(current_instances)]
-            value_subtree.append(subtree)
-            tree.append(value_subtree)
-    return tree
+# def majority_node(instances):
+#     """the class value that most instances have
+#         Args:
+#             instances (list of list of str/int) : represent the instances in this split
+#         Returns:
+#             label(str): most occuring/frequent class label of the instances
+#     """
+#     labels = []
+#     freqs = []
+#     for instance in instances:
+#         if instance[-1] not in labels:
+#             labels.append(instance[-1])
+#             freqs.append(1)
+#         else:
+#             i = labels.index(instance[-1])
+#             freqs[i] += 1
+#     min = 100
+#     min_index = -1
+#     for i, freq in enumerate(freqs):
+#         if freq < min:
+#             min = freq
+#             min_index = i
+#         elif freq == min:
+#             if labels[min_index] > labels[i]:
+#                 min_index = i
+#     return labels[min_index]
 
 
-def all_same_class(att_partition):
-    """checks if the istances have same class label
-        Args:
-            att_partition (list of list of str/int) : represent the instances in this split
-        Returns:
-            boolean of True or False, True means all same, false otherwise
-d
-        """
-    label = None
-    for partition in att_partition:
-        if label is None:
-            label = partition[-1]
-        else:
-            if label != partition[-1]:
-                return False
-    return True
+# def get_attribute_domains(header, table):
+#     """returns the attribute domains in each attribute in alphabetical order
+#         Args:
+#             table (list of list of str/int) : represent the whole dataset table
+#             header (list of str): header of the table
+#         Returns:
+#             dict_domains(dictionary): list of attributes as keys and and its domains as values
+#     """
+#     dict_domains = {}
+#     arr_vals = []
+#     for i, elem in enumerate(header):
+#         arr_vals = []
+#         for row in table:
+#             if row[i] not in arr_vals:
+#                 arr_vals.append(row[i])
+#         arr_vals.sort()
+#         dict_domains.update({elem: arr_vals})
+
+#     return dict_domains
 
 
-def recurse_tree(x_val, att_val, tree, header):
-    """recurse the tree
-        Args:
-            x_val (list of str/int) : the instance to recurse on/predict
-            att_val (str): attribute value
-            header (list of str): header of the table
-            tree (ND-array): tree represented in nested list
-        Returns:
-            prediction(str): class label
-        """
-    prediction = ""
-    # base case:
-    if tree[0] == "Value" and tree[1] == att_val and tree[2][0] != "Attribute":
-        for i in range(2, len(tree)):
-            if tree[i][0] == "Leaf":
-                prediction = tree[i][1]
-                return prediction
-    else:
-        if att_val != "":
-            tree = tree[2]
-        if tree[0] == "Attribute":
-            print("hedaer ere",header,"tree_i",tree[1])
-            index = header.index(tree[1])
-            att_val = x_val[index]
-            for i in range(2, len(tree)):
-                if tree[i][1] == att_val:
-                    prediction = recurse_tree(x_val, att_val, tree[i], header)
-    return prediction
+# def tdidt(current_instances, available_attributes, header, attribute_domains, X_train):
+#     """responsible for fitting the dataset into a tree using the tdidt algorithmn, will decide how to split into a tree
+#         Args:
+#             current_instances (list of list of str/int) : represent the instances in this split
+#             available_attributes (list of str): attributes that can still be split on
+#             header (list of str): header of the table
+#             attribute_domains (dictionary): attribute domains for all the attributes
+#             X_train (list of list of str/int): represent the orignal X dataset
+#         Returns:
+#             tree(N-D array of list or int): tree represented in nested lists
+#     """
+#     # basic approach (uses recursion!!):
+#     # select an attribute to split on
+#     attribute = select_attribute(
+#         current_instances, available_attributes, header, X_train)
+#     #print("split on:",attribute)
+#     # remove split att
+#     available_attributes.remove(attribute)
+#     tree = ["Attribute", attribute]
+#     # group data by attribute domains (creates pairwise disjoint partitions)
+#     partition = partition_instances(
+#         current_instances, attribute, header, attribute_domains)
+#     # for each partition, repeat unless one of the following occurs (base case)
+#     for att_val, att_partition in partition.items():
+#         value_subtree = ["Value", att_val]
+#     #   CASE 1: all class labels of the partition are the same => make a leaf node
+#         if len(att_partition) > 0 and all_same_class(att_partition):
+#             #print("CASE 1, ALL SAME CATEGORIES")
+#             node = ["Leaf", att_partition[0][-1],
+#                     len(att_partition), len(current_instances)]
+#             value_subtree.append(node)
+#             tree.append(value_subtree)
+#         #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
+#         elif len(att_partition) > 0 and len(available_attributes) == 0:
+#             #print("CASE 2, NO MORE ATT")
+#             node_val = majority_node(att_partition)
+#             node = ["Leaf", node_val, len(
+#                 att_partition), len(current_instances)]
+#             value_subtree.append(node)
+#             tree.append(value_subtree)
+#         #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
+#         elif len(att_partition) == 0:
+#             #print("CASE 3 empty partition")
+#             return None
+#         else:
+#             subtree = tdidt(att_partition, available_attributes.copy(
+#             ), header, attribute_domains, X_train)
+#             if subtree is None:
+#                 val = 0
+#                 node_val = majority_node(att_partition)
+#                 for rows in att_partition:
+#                     if rows[-1] == node_val:
+#                         val += 1
+#                 subtree = ["Leaf", node_val, len(
+#                     att_partition), len(current_instances)]
+#             value_subtree.append(subtree)
+#             tree.append(value_subtree)
+#     return tree
+
+
+# def all_same_class(att_partition):
+#     """checks if the istances have same class label
+#         Args:
+#             att_partition (list of list of str/int) : represent the instances in this split
+#         Returns:
+#             boolean of True or False, True means all same, false otherwise
+# d
+#         """
+#     label = None
+#     for partition in att_partition:
+#         if label is None:
+#             label = partition[-1]
+#         else:
+#             if label != partition[-1]:
+#                 return False
+#     return True
+
+
+# def recurse_tree(x_val, att_val, tree, header):
+#     """recurse the tree
+#         Args:
+#             x_val (list of str/int) : the instance to recurse on/predict
+#             att_val (str): attribute value
+#             header (list of str): header of the table
+#             tree (ND-array): tree represented in nested list
+#         Returns:
+#             prediction(str): class label
+#         """
+#     prediction = ""
+#     # base case:
+#     if tree[0] == "Value" and tree[1] == att_val and tree[2][0] != "Attribute":
+#         for i in range(2, len(tree)):
+#             if tree[i][0] == "Leaf":
+#                 prediction = tree[i][1]
+#                 return prediction
+#     else:
+#         if att_val != "":
+#             tree = tree[2]
+#         if tree[0] == "Attribute":
+#             print("hedaer ere",header,"tree_i",tree[1])
+#             index = header.index(tree[1])
+#             att_val = x_val[index]
+#             for i in range(2, len(tree)):
+#                 if tree[i][1] == att_val:
+    #                 prediction = recurse_tree(x_val, att_val, tree[i], header)
+    # return prediction
 
 
 def print_tree(tree, depth, rule_str, class_name):
@@ -427,45 +427,45 @@ def bonus_graphviz(tree, depth, labels, outfile, value=None, prev_att=None):
                            outfile, tree[i][1], box_name)
 
 
-def equal_trees(tree1, tree2):
-    """recursively check is both trees are equal
-        Args:
-            tree1 (ND-array): tree 1 represented in nested list
-            tree2 (ND-array): tree 2 represented in nested list
-    """
-    if tree2[0] == "Leaf":
-        if tree2[1] != tree1[1] or tree2[2] != tree1[2] or tree2[3] != tree1[3]:
-            return False
-        return True
-    else:
-        if tree2[0] == "Attribute":
-            if tree2[1] != tree1[1]:
-                return False
-            for i in range(2, len(tree2)):
-                if tree2[i] != tree1[i]:
-                    return False
-                else:
-                    is_true = equal_trees(tree1[i][2], tree2[i][2])
-                    if is_true is False:
-                        return False
-    return True
+# def equal_trees(tree1, tree2):
+#     """recursively check is both trees are equal
+#         Args:
+#             tree1 (ND-array): tree 1 represented in nested list
+#             tree2 (ND-array): tree 2 represented in nested list
+#     """
+#     if tree2[0] == "Leaf":
+#         if tree2[1] != tree1[1] or tree2[2] != tree1[2] or tree2[3] != tree1[3]:
+#             return False
+#         return True
+#     else:
+#         if tree2[0] == "Attribute":
+#             if tree2[1] != tree1[1]:
+#                 return False
+#             for i in range(2, len(tree2)):
+#                 if tree2[i] != tree1[i]:
+#                     return False
+#                 else:
+#                     is_true = equal_trees(tree1[i][2], tree2[i][2])
+#                     if is_true is False:
+#                         return False
+#     return True
 
 
-def find_max(label, freqs):
-    """ find max finds the label associated with the highest frequency given a list of frequencies
-        Args:
-            label(list of str): list of labels
-            freqs(list of int): frequency of each label(parallel to labels)
-        Returns:
-            max_label(str): label of the highest frequency
-    """
-    max_f = 0
-    max_label = ""
-    for i, freq in enumerate(freqs):
-        if freq > max_f:
-            max_f = freq
-            max_label = label[i]
-    return max_label
+# def find_max(label, freqs):
+#     """ find max finds the label associated with the highest frequency given a list of frequencies
+#         Args:
+#             label(list of str): list of labels
+#             freqs(list of int): frequency of each label(parallel to labels)
+#         Returns:
+#             max_label(str): label of the highest frequency
+#     """
+#     max_f = 0
+#     max_label = ""
+#     for i, freq in enumerate(freqs):
+#         if freq > max_f:
+#             max_f = freq
+#             max_label = label[i]
+#     return max_label
 
 
 def compute_random_subset(header, f):
@@ -473,3 +473,211 @@ def compute_random_subset(header, f):
     values_copy = header[:]  # shallow copy
     np.random.shuffle(values_copy)  # in place shuffle
     return values_copy[:f]
+
+
+def select_attribute(instances, attributes):
+    """selects the attribute index to partition on
+
+    Args:
+        instances: available instances
+        attribute: available attributes to select from
+
+    Returns:
+       attributes[rand_index]: index of attribute
+    """
+    select_min_entropy = []
+    for i in attributes:
+        attribute_types = []
+        # find all attribute instance types
+        for row in instances:
+            if row[i] not in attribute_types:
+                attribute_types.append(row[i])
+        attribute_instances = [[] for _ in attribute_types]
+        # find amount for each attribute
+        for row in instances:
+            index_att = attribute_types.index(row[i])
+            attribute_instances[index_att].append(1)
+
+        class_types = []
+        for values in instances:
+            if values[-1] not in class_types:
+                class_types.append(values[-1])
+        class_type_check = [[[] for _ in class_types] for _ in attribute_types]
+
+        for j, _ in enumerate(instances):
+            class_type_check[attribute_types.index(
+                instances[j][i])][class_types.index(instances[j][-1])].append(1)
+
+        # calculate smallest E_new
+        enew = 0
+        for entropy_att, _ in enumerate(class_type_check):
+            entropy = 0
+            for class_entropy in range(len(class_type_check[entropy_att])):
+                val_instance = sum(
+                    class_type_check[entropy_att][class_entropy])
+                einstance = val_instance / \
+                    sum(attribute_instances[entropy_att])
+                if einstance != 0:
+                    entropy += -1 * einstance * math.log(einstance, 2)
+            enew += entropy * \
+                sum(attribute_instances[entropy_att]) / len(instances)
+        select_min_entropy.append(enew)
+
+    min_index = select_min_entropy.index(min(select_min_entropy))
+    return attributes[min_index]
+
+
+def partition_instances(instances, split_attribute, X_train):
+    """partitions list in dictionary type
+
+    Args:
+        instances: available isntances to be patitioned
+        split_attribute: attribute that will be partitioned on
+
+    Returns:
+       partitions: instance partitions
+    """
+    # lets use a dictionary
+    partitions = {}  # key (string): value (subtable)
+    # att_index = header.index(split_attribute) # e.g. 0 for level
+    attribute_domains = {}
+    for l, _ in enumerate(X_train[0]):
+        no_repeats = []
+        for row in X_train:
+            if str(row[l]) not in no_repeats:
+                no_repeats.append(str(row[l]))
+        attribute_domains[l] = no_repeats
+
+    att_index = split_attribute
+    # e.g. ["Junior", "Mid", "Senior"]
+    att_domain = attribute_domains[att_index]
+    for att_value in att_domain:
+        partitions[att_value] = []
+        # task: finish
+        for instance in instances:
+            if instance[att_index] == att_value:
+                partitions[att_value].append(instance)
+
+    return partitions
+
+
+def all_same_class(instances):
+    """checks if all instances have the same label
+
+    Args:
+        instances: instances
+        class_index: label value being checked
+
+    Returns:
+       True or False
+    """
+    check_same = instances[0][-1]
+    for attribute_vals in instances:
+        if attribute_vals[-1] != check_same:
+            return False
+    return True
+
+
+def second_case(att_partition, current_instances, value_subtree, tree):
+    """does majority vote for leaf
+
+    Args:
+        att_partition: instances to be partitioned
+        current_instances: available attributes to partition
+        value_subtree: subtree
+        tree: tree
+    """
+    classifiers = []
+    for value_class in att_partition:
+        if value_class[-1] not in classifiers:
+            classifiers.append(value_class[-1])
+    # find amount for each classifier
+
+    find_majority = [[] for _ in classifiers]
+    for value_class in att_partition:
+        find_majority[classifiers.index(value_class[-1])].append(1)
+
+    # find max amount
+    max_val = 0
+    for count in find_majority:
+        total_sum = sum(count)
+        if total_sum > max_val:
+            majority_rule = classifiers[find_majority.index(count)]
+
+    leaf_node = ["Leaf", majority_rule, len(
+        att_partition), len(current_instances)]
+    value_subtree.append(leaf_node)
+    tree.append(value_subtree)
+
+
+def tdidt(current_instances, available_attributes, X_train):
+    """recursively builds decision tree
+
+    Args:
+        current_instances: instances to be partitioned
+        available_attributes: available attributes to partition
+
+    Returns:
+       tree: the updated tree
+    """
+    # select an attribute to split on
+    attribute = select_attribute(current_instances, available_attributes)
+    available_attributes.remove(attribute)
+    tree = ["Attribute", "att" + str(attribute)]
+    # group data by attribute domains (creates pairwise disjoint partitions)
+    partitions = partition_instances(current_instances, attribute, X_train)
+    # for each partition, repeat unless one of the following occurs (base case)
+    for att_value, att_partition in partitions.items():
+        value_subtree = ["Value", att_value]
+
+        #    CASE 1: all class labels of the partition are the same => make a leaf node
+        if len(att_partition) > 0 and all_same_class(att_partition):
+            leaf_node = ["Leaf", att_partition[0][-1],
+                         len(att_partition), len(current_instances)]
+            value_subtree.append(leaf_node)
+            tree.append(value_subtree)
+
+        #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
+        elif len(att_partition) > 0 and len(available_attributes) == 0:
+            second_case(att_partition, current_instances, value_subtree, tree)
+
+        #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
+        elif len(att_partition) == 0:
+            return None
+
+        else:  # the previous conditions are all false... recurse!!
+            subtree = tdidt(
+                att_partition, available_attributes.copy(), X_train)
+            if subtree is None:
+                second_case(att_partition, current_instances,
+                            value_subtree, tree)
+            else:
+                value_subtree.append(subtree)
+                tree.append(value_subtree)
+    return tree
+
+
+def tdidt_predict(header, tree, instance):
+    """predicts instances using decisions tree
+
+    Args:
+        header: attribute labels
+        tree: tree after fit() called
+        instance: X_test instance
+
+    Returns:
+       tree[1]: classification at leaf
+    """
+    # recursively traverse tree to make a prediction
+    # are we at a leaf node (base case) or attribute node?
+    info_type = tree[0]
+    if info_type == "Leaf":
+        return tree[1]  # label
+    # we are at an attribute
+    # find attribute value match for instance
+    # for loop
+    att_index = header.index(tree[1])
+    for i in range(2, len(tree)):
+        value_list = tree[i]
+        if value_list[1] == instance[att_index]:
+            return tdidt_predict(header, value_list[2], instance)
