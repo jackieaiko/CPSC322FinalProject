@@ -123,16 +123,16 @@ class MyKNeighborsClassifier:
             top_indices = []
             row_indexes_dists = []
             for i, train_instance in enumerate(self.X_train):
-                dist = myutils.compute_euclidean_distance(train_instance,test)
+                dist = myutils.compute_euclidean_distance(train_instance, test)
                 row_indexes_dists.append([i, dist])
-            row_indexes_dists.sort(key=operator.itemgetter(-1)) # -1 or 1
+            row_indexes_dists.sort(key=operator.itemgetter(-1))  # -1 or 1
             top_k = row_indexes_dists[:self.n_neighbors]
             for row in top_k:
                 top_distance.append(row[1])
                 top_indices.append(row[0])
             distances.append(top_distance)
             neighbor_indices.append(top_indices)
-        return distances,neighbor_indices
+        return distances, neighbor_indices
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -149,7 +149,7 @@ class MyKNeighborsClassifier:
         for indices in res[1]:
             class_label = []
             class_freq = []
-            #for each X_test value
+            # for each X_test value
             for index in indices:
                 val = self.y_train[index]
                 if val not in class_label:
@@ -157,10 +157,10 @@ class MyKNeighborsClassifier:
                     class_freq.append(1)
                 else:
                     idx = class_label.index(val)
-                    class_freq[idx] +=1
-            max_freq_label = myutils.find_max(class_label,class_freq)
+                    class_freq[idx] += 1
+            max_freq_label = myutils.find_max(class_label, class_freq)
             y_predicted.append([max_freq_label])
-        
+
         return y_predicted
         """
         distances, neighbor_indices = self.kneighbors(X_test)
@@ -240,6 +240,7 @@ class MyDummyClassifier:
         # ex. 4 yes's  if X_test =  [[] [] [] []] no matter contents
         return y_predicted
 
+
 class MyNaiveBayesClassifier:
     """Represents a Naive Bayes classifier.
     Attributes:
@@ -252,6 +253,7 @@ class MyNaiveBayesClassifier:
         You may add additional instance attributes if you would like, just be sure to update this docstring
         Terminology: instance = sample = row and attribute = feature = column
     """
+
     def __init__(self):
         """Initializer for MyNaiveBayesClassifier.
         """
@@ -271,38 +273,39 @@ class MyNaiveBayesClassifier:
             You are free to choose the most appropriate data structures for storing the priors
                 and posteriors.
         """
-        distinct_labels,freqs = myutils.get_labels(y_train)
-        priors ={}
+        distinct_labels, freqs = myutils.get_labels(y_train)
+        priors = {}
         posteriors = []
         initialize_dict = {}
-        for i,label in enumerate(distinct_labels):
-            prob = round(freqs[i] / sum(freqs),3)
-            priors.update({label:prob})
-            initialize_dict.update({label:0.0})
+        for i, label in enumerate(distinct_labels):
+            prob = round(freqs[i] / sum(freqs), 3)
+            priors.update({label: prob})
+            initialize_dict.update({label: 0.0})
 
         for elem in enumerate(X_train[0]):
             index = elem[0]
-            #get all vals of att_x
-            column = myutils.get_column(X_train,index)
+            # get all vals of att_x
+            column = myutils.get_column(X_train, index)
             posteriors.append({})
-            #seperate att_x into its y_labels
+            # seperate att_x into its y_labels
             all_labels = []
-            for i,label in enumerate(distinct_labels):
+            for i, label in enumerate(distinct_labels):
                 label_col = []
-                for j,row in enumerate(column):
+                for j, row in enumerate(column):
                     if y_train[j] == label:
                         label_col.append(row)
                 distinct_att_label, freq_att = myutils.get_labels(label_col)
-                for k,att_label in enumerate(distinct_att_label):
+                for k, att_label in enumerate(distinct_att_label):
                     if att_label not in all_labels:
                         all_labels.append(att_label)
-                        new_dict_entry= {}
+                        new_dict_entry = {}
                         curr_dict = dict(initialize_dict)
-                        curr_dict[label] = round(freq_att[k] / freqs[i],3)
-                        new_dict_entry.update({att_label:curr_dict})
+                        curr_dict[label] = round(freq_att[k] / freqs[i], 3)
+                        new_dict_entry.update({att_label: curr_dict})
                         posteriors[index].update(new_dict_entry)
                     else:
-                        posteriors[index][att_label][label] = round(freq_att[k] / freqs[i],3)
+                        posteriors[index][att_label][label] = round(
+                            freq_att[k] / freqs[i], 3)
         self.priors = priors
         self.posteriors = posteriors
 
@@ -318,13 +321,13 @@ class MyNaiveBayesClassifier:
 
         for row in X_test:
             keys = self.priors.keys()
-            #[yes,no]
+            # [yes,no]
             max_key = ""
             max_key_val = 0.0
             for key in keys:
                 curr_key_val = 1.0
-                #[1,2]
-                for i,col in enumerate(row):
+                # [1,2]
+                for i, col in enumerate(row):
                     curr_key_val *= self.posteriors[i][col][key]
                 curr_key_val *= self.priors[key]
                 if curr_key_val > max_key_val:
@@ -333,6 +336,7 @@ class MyNaiveBayesClassifier:
             y_predicted.append([max_key])
 
         return y_predicted
+
 
 class MyDecisionTreeClassifier:
     """Represents a decision tree classifier.
@@ -355,7 +359,7 @@ class MyDecisionTreeClassifier:
         self.y_train = None
         self.tree = None
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, f):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
         Args:
@@ -376,11 +380,12 @@ class MyDecisionTreeClassifier:
         train.pop(0)
         header = X_train.pop(0)
         available_att = header.copy()
+        available_atts = myutils.compute_random_subset(available_att, f)
         att_domains = myutils.get_attribute_domains(header, X_train)
         self.y_train = y_train
         # next, make a copy of your header .... tdidt() is going to modify the list
         # also recall: python is pass by object reference
-        tree = myutils.tdidt(train, available_att,
+        tree = myutils.tdidt(train, available_atts,
                              header, att_domains, X_train)
         self.tree = tree
 
@@ -452,28 +457,24 @@ class MyRandomForestClassifier:
         Terminology: instance = sample = row and attribute = feature = column
     """
 
-    def __init__(self):
+    def __init__(self, n, m, f):
         """Initializer for MyDecisionTreeClassifier.
         """
         self.X_train = None
         self.y_train = None
-        self.tree = None
+        self.forest = None
+
+        self.n = n
+        self.m = m
+        self.f = f
 
     def fit(self, X_train, y_train):
-        """Fits a decision tree classifier to X_train and y_train using the TDIDT
-        (top down induction of decision tree) algorithm.
+        """Fits a decision random forest classifier 
         Args:
             X_train(list of list of obj): The list of training instances (samples).
                 The shape of X_train is (n_train_samples, n_features)
             y_train(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
-        Notes:
-            Since TDIDT is an eager learning algorithm, this method builds a decision tree model
-                from the training data.
-            Build a decision tree using the nested list representation described in class.
-            On a majority vote tie, choose first attribute value based on attribute domain ordering.
-            Store the tree in the tree attribute.
-            Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
         pass
 
