@@ -90,9 +90,9 @@ n_performance = []
 header = ["level", "lang", "tweets", "phd"]
 for i in range(n):
     X_train, y_train, X_test, y_test = compute_bootstrapped_sample(remainder)
-    X_train.insert(0,header)
-    print("Xtrain",X_train)
-    y_train.insert(0,"interviewed_well")
+    #X_train.insert(0,header)
+    #print("Xtrain",X_train)
+    #y_train.insert(0,"interviewed_well")
     decision_tree_classifier = MyDecisionTreeClassifier()
     decision_tree_classifier.fit(X_train, y_train, f)
 

@@ -377,9 +377,12 @@ class MyDecisionTreeClassifier:
         """
         self.X_train = X_train.copy()
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        train.pop(0)
-        header = X_train.pop(0)
-        print("eader", header)
+        #train.pop(0)
+        #header = X_train.pop(0)
+        #print("eader", header)
+        header = []
+        for i in range(0,len(X_train[0])):
+            header.append("att"+str(i))
         available_att = header.copy()
         available_atts = myutils.compute_random_subset(available_att, f)
         att_domains = myutils.get_attribute_domains(header, X_train)
