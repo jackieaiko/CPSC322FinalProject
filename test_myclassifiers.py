@@ -2,6 +2,8 @@
 testing MyRandomForestClassifier
 '''
 import numpy as np
+from sympy import N
+import mysklearn.myevaluation as myevaluation
 from mysklearn.myclassifiers import MySimpleLinearRegressionClassifier,\
     MyKNeighborsClassifier,\
     MyDummyClassifier,\
@@ -25,43 +27,35 @@ y_train_class_example2 = ["no", "yes",
                           "no", "no", "yes", "no", "yes", "yes"]
 
 
-# def test_kneighbors_classifier_kneighbors():
-#     """tests kneighbors function from MyKNeighborsClassifier
-#     """
-#     function_kneighbor = MyKNeighborsClassifier()
+def test_kneighbors_classifier_kneighbors():
+    """tests kneighbors function from MyKNeighborsClassifier
+    """
+    function_kneighbor = MyKNeighborsClassifier()
 
-#     X_test = [0.33, 1]
-#     test_distances = [0.67, 1.00, 1.05]
-#     test_neighbor_indices = [0, 2, 3]
+    X_test = [[0.33, 1]]
+    test_distances = [0.67, 1.00, 1.05]
+    test_neighbor_indices = [0, 2, 3]
 
-#     function_kneighbor.fit(X_train_class_example1, y_train_class_example1)
-#     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
+    function_kneighbor.fit(X_train_class_example1, y_train_class_example1)
+    func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-#     assert np.allclose(func_dist, test_distances)
-#     assert np.allclose(funct_indices, test_neighbor_indices)
+    assert np.allclose(func_dist, test_distances)
+    assert np.allclose(funct_indices, test_neighbor_indices)
 
-#     X_test = [2, 3]
-#     test_distances = [1.41, 1.41, 2.00]
-#     test_neighbor_indices = [0, 4, 6]
+    X_test = [[2, 3]]
+    test_distances = [1.41, 1.41, 2.00]
+    test_neighbor_indices = [0, 4, 6]
 
-#     function_kneighbor.fit(X_train_class_example2, y_train_class_example2)
-#     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
+    function_kneighbor.fit(X_train_class_example2, y_train_class_example2)
+    func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-#     assert np.allclose(func_dist, test_distances)
-#     assert np.allclose(funct_indices, test_neighbor_indices)
-
-
-# X_test = [0.33, 1]
-# function_kneighbor = MyKNeighborsClassifier()
-# function_kneighbor.fit(X_train_class_example1, y_train_class_example1)
-# func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
-# print(func_dist)
-# print(funct_indices)
+    assert np.allclose(func_dist, test_distances)
+    assert np.allclose(funct_indices, test_neighbor_indices)
 
 
 def test_kneighbors_classifier_predict():
-#     """tests predict function from MyKNeighborsClassifier
-#     """
+    #     """tests predict function from MyKNeighborsClassifier
+    #     """
     function_kpredict = MyKNeighborsClassifier()
 
     X_test = [[0.33, 1]]
@@ -250,72 +244,66 @@ X_train_interview = [
 y_train_interview = ["False", "False", "True", "True", "True", "False", "True",
                      "False", "True", "True", "True", "True", "True", "False"]
 
+
 def test_decision_tree_classifier_fit():
-    # interview dataset
-    interview_header = ["level", "lang", "tweets", "phd", "interviewed_well"]
-    interview_table = [
-            ["Senior", "Java", "no", "no", "False"],
-            ["Senior", "Java", "no", "yes", "False"],
-            ["Mid", "Python", "no", "no", "True"],
-            ["Junior", "Python", "no", "no", "True"],
-            ["Junior", "R", "yes", "no", "True"],
-            ["Junior", "R", "yes", "yes", "False"],
-            ["Mid", "R", "yes", "yes", "True"],
-            ["Senior", "Python", "no", "no", "False"],
-            ["Senior", "R", "yes", "no", "True"],
-            ["Junior", "Python", "yes", "no", "True"],
-            ["Senior", "Python", "yes", "yes", "True"],
-            ["Mid", "Python", "no", "yes", "True"],
-            ["Mid", "Java", "yes", "no", "True"],
-            ["Junior", "Python", "no", "yes", "False"]
-        ]
+    decision_tree = MyDecisionTreeClassifier()
+    decision_tree.fit(X_train_interview, y_train_interview,
+                      len(y_train_interview))
 
-    # note: this tree uses the generic "att#" attribute labels because fit() does not and should not accept attribute names
-    # note: the attribute values are sorted alphabetically
-    interview_tree = \
-            ["Attribute", "level",
-                ["Value", "Junior", 
-                    ["Attribute", "phd",
-                        ["Value", "no", 
-                            ["Leaf", "True", 3, 5]
-                        ],
-                        ["Value", "yes", 
-                            ["Leaf", "False", 2, 5]
-                        ]
-                    ]
-                ],
-                ["Value", "Mid",
-                    ["Leaf", "True", 4, 14]
-                ],
-                ["Value", "Senior",
-                    ["Attribute", "tweets",
-                        ["Value", "no",
-                            ["Leaf", "False", 3, 5]
-                        ],
-                        ["Value", "yes",
-                            ["Leaf", "True", 2, 5]
-                        ]
-                    ]
-                ]
-            ]
-    tree_classifier = MyDecisionTreeClassifier()
-    interview_table.insert(0,interview_header)
-    intw_y_train = [interview_table[i][-1] for i in range(len(interview_table))]
-    intw_x_train = [interview_table[i][:-1] for i in range(len(interview_table))]
-
-    tree_classifier.fit(intw_x_train,intw_y_train)
-
-    #check if tree is correct or not
-    assert myutils.equal_trees(tree_classifier.tree,interview_tree) is True
+    tree_job = \
+        ['Attribute', 'att0',
+         ['Value', 'Senior',
+          ['Attribute', 'att2',
+           ['Value', 'no',
+            ['Leaf', 'False', 3, 5]],
+              ['Value', 'yes',
+               ['Leaf', 'True', 2, 5]]]],
+            ['Value', 'Mid',
+             ['Leaf', 'True', 4, 14]],
+            ['Value', 'Junior',
+             ['Attribute', 'att3',
+              ['Value', 'no',
+               ['Leaf', 'True', 3, 5]],
+                 ['Value', 'yes',
+                  ['Leaf', 'False', 2, 5]]]]]
+    assert tree_job == decision_tree.tree
 
 
-# knn problem
-# decision tree incorrect
+def test_decision_tree_classifier_predict():
+    decision_tree = MyDecisionTreeClassifier()
+    decision_tree.fit(X_train_interview, y_train_interview,
+                      len(y_train_interview))
+    X_test = [["Junior", "Java", "yes", "no"],
+              ["Junior", "Java", "yes", "yes"]]
+    expected_predict = ["True", "False"]
+    predicted = decision_tree.predict(X_test)
+    assert expected_predict == predicted
 
 
 def test_random_forest_fit():
-    pass
+    X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
+        X_train_interview, y_train_interview)
+    test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
+    remainder_set = [X_train1[i] + [y_train1[i]]
+                     for i in range(len(X_train1))]
+
+    random_forest = MyRandomForestClassifier(5, 2, 3)
+    random_forest.fit(remainder_set, test_set)
+
+    assert 5 == random_forest.n
+    assert 2 == random_forest.m
+    assert 3 == random_forest.f
 
 
 def test_random_forest_predict():
-    pass
+    X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
+        X_train_interview, y_train_interview)
+    test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
+    remainder_set = [X_train1[i] + [y_train1[i]]
+                     for i in range(len(X_train1))]
+
+    random_forest = MyRandomForestClassifier(5, 2, 3)
+    random_forest.fit(remainder_set, test_set)
+
+    y_predicted = random_forest.predict()
+    assert 5 == len(y_predicted)

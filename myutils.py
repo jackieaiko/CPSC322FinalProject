@@ -110,6 +110,23 @@ def col_pval(p_values, header):
     return new_header
 
 
+def find_max(label, freqs):
+    """ find max finds the label associated with the highest frequency given a list of frequencies
+        Args:
+            label(list of str): list of labels
+            freqs(list of int): frequency of each label(parallel to labels)
+        Returns:
+            max_label(str): label of the highest frequency
+    """
+    max_f = 0
+    max_label = ""
+    for i, freq in enumerate(freqs):
+        if freq > max_f:
+            max_f = freq
+            max_label = label[i]
+    return max_label
+
+
 def parameterized_classifiers(train_folds, test_folds, n_splits, survey_table, y_data, classifier_name, f):
     classifier_names = ["Dummy Classifier", "KNN Classifier",
                         "Naive Bayes Classifier", "Decision Tree Classifier"]

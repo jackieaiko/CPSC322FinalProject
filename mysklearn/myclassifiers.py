@@ -5,6 +5,7 @@ import operator
 import os
 from mysklearn import myutils
 from mysklearn.mysimplelinearregressor import MySimpleLinearRegressor
+from mysklearn import myevaluation
 
 
 class MySimpleLinearRegressionClassifier:
@@ -467,20 +468,58 @@ class MyRandomForestClassifier:
     def fit(self, remainder_set, test_set):
         """Fits a decision random forest classifier 
         Args:
-            X_train(list of list of obj): The list of training instances (samples).
+            X(list of list of obj): The list of training instances (samples).
                 The shape of X_train is (n_train_samples, n_features)
-            y_train(list of obj): The target y values (parallel to X_train)
+            y(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
         """
 
-        pass
+        self.remainder_set = remainder_set
+        self.test_set = test_set
 
-    def predict(self, X_test):
-        """Makes predictions for test instances in X_test.
-        Args:
-            X_test(list of list of obj): The list of testing samples
-                The shape of X_test is (n_test_samples, n_features)
+        n_forest = []
+        n_performance = []
+        for _ in range(self.n):
+            X_train, y_train, X_test, y_test = myutils.compute_bootstrapped_sample(
+                remainder_set)
+
+            decision_tree_classifier = MyDecisionTreeClassifier()
+            decision_tree_classifier.fit(X_train, y_train, self.f)
+
+            y_predicted = decision_tree_classifier.predict(X_test)
+            accuracy_score = myevaluation.accuracy_score(y_test, y_predicted)
+
+            n_forest.append(decision_tree_classifier.tree)
+            n_performance.append(accuracy_score)
+
+        # find largest values
+        largest_indices = sorted(range(len(n_performance)),
+                                 key=lambda i: n_performance[i])[-self.m:]
+
+        self.m_forest = [n_forest[i] for i in largest_indices]
+
+    def predict(self):
+        """Makes predictions for test instances in test_set.
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-        pass
+        header = []
+        for header_len in range(len(self.test_set[0])):
+            header.append("att" + str(header_len))
+
+        # get predicted instances for each tree
+        all_predicted = []
+        for tree in self.m_forest:
+            y_predicted = []
+            for instance in self.test_set:
+                predicted = myutils.tdidt_predict(header, tree, instance)
+                y_predicted.append(predicted)
+            all_predicted.append(y_predicted)
+
+        # find majority for each column
+        y_predicted = []
+        for i in range(len(all_predicted[0])):
+            majority_vote = myutils.find_majority(i, all_predicted)
+            y_predicted.append(majority_vote)
+
+        return y_predicted

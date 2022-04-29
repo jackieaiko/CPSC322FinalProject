@@ -59,7 +59,6 @@ def train_test_split(X, y, test_size=0.33, random_state=None, shuffle=True):
     for i, _ in enumerate(y):
         if i not in test_instance_indices:
             y_train.append(y[i])
-    print(y_train)
 
     y_test = []
     for i in test_instance_indices:

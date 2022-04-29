@@ -1,38 +1,10 @@
 
-from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier, MyDecisionTreeClassifier
+from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier, MyDecisionTreeClassifier, MyRandomForestClassifier
 import mysklearn.myevaluation as myevaluation
 from mysklearn import myutils
 import numpy as np
-
-
-def compute_bootstrapped_sample(table):
-    n = len(table)
-    train_set = []
-    for _ in range(n):
-        # Return random integers from low (inclusive) to high (exclusive)
-        rand_index = np.random.randint(0, n)
-        train_set.append(table[rand_index])
-
-    validation_set = []
-    for i in range(n):
-        if table[i] not in train_set:
-            validation_set.append(table[i])
-
-    X_train = [row[0:-1] for row in train_set]
-    y_train = [row[-1] for row in train_set]
-    X_test = [row[0:-1] for row in validation_set]
-    y_test = [[row[-1]] for row in validation_set]
-
-    return X_train, y_train, X_test, y_test
-
-
-def compute_random_subset(header, f):
-    # there is a function np.random.choice()
-    values_copy = header[:]  # shallow copy
-    np.random.shuffle(values_copy)  # in place shuffle
-    return values_copy[:f]
-
-
+import random
+random.seed(0)
 X = [
     ["Senior", "Java", "no", "no"],
     ["Senior", "Java", "no", "yes"],
@@ -77,57 +49,15 @@ y = ["False", "False", "True", "True", "True", "False", "True",
 
 # split = third of size of dataset
 
-X_train, X_test, y_train, y_test = myevaluation.train_test_split(X, y)
-test_set = [X_test[i] + [y_test[i]] for i in range(len(X_test))]
-remainder = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
 
-n = 4
-f = 3
-m = 2
+X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
+    X, y)
+test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
+remainder_set = [X_train1[i] + [y_train1[i]]
+                 for i in range(len(X_train1))]
 
-n_forest = []
-n_performance = []
-header = ["level", "lang", "tweets", "phd"]
-for i in range(n):
-    X_train, y_train, X_test, y_test = compute_bootstrapped_sample(remainder)
-    # X_train.insert(0,header)
-    # print("Xtrain",X_train)
-    # y_train.insert(0,"interviewed_well")
-    decision_tree_classifier = MyDecisionTreeClassifier()
-    decision_tree_classifier.fit(X_train, y_train, f)
-
-    y_predicted = decision_tree_classifier.predict(X_test)
-    accuracy_score = myevaluation.accuracy_score(y_test, y_predicted)
-
-    n_forest.append(decision_tree_classifier.tree)
-    n_performance.append(accuracy_score)
-
-# find largest values
-largest_indices = sorted(range(len(n_performance)),
-                         key=lambda i: n_performance[i])[-m:]
-
-m_forest = [n_forest[i] for i in largest_indices]
-print(m_forest)
-
-# predicted_forests = []
-# # for i in range(m):
-tree = m_forest[1].copy()
-
-# y_predicted = []
-# remainder = remainder.copy()
-# print("remainder", remainder)
-# #header = remainder.pop(0)
-# for test in X_test:
-#     prediction = myutils.recurse_tree(test, "", tree, header)
-#     y_predicted.append([prediction])
-# print(X_test)
-# print(y_predicted)
-header = []
-for header_len in range(len(test_set[0])):
-    header.append("att" + str(header_len))
-
-y_predicted = []
-for instance in test_set:
-    predicted = myutils.tdidt_predict(header, tree, instance)
-    y_predicted.append(predicted)
+random_forest = MyRandomForestClassifier(5, 2, 3)
+random_forest.fit(remainder_set, test_set)
+y_predicted = random_forest.predict()
 print(y_predicted)
+print(y_test1)

@@ -131,203 +131,6 @@ def find1_column(X_train, col_index):
     return col
 
 
-# def select_attribute(instances, attributes, header, X_train):
-#     """chooses the attribute to split on based on entropy value
-#         Args:
-#             instances (list of list of str/int) : represent the instances in this split
-#             attributes (list of str): attributes to split on
-#             header (list of str): header of the table
-#             X_train (list of list of str/int): represent the orignal X dataset
-#         Returns:
-#             split_att(str): attribute to split on
-#         Notes:
-#             entropy value calculated
-#         """
-#     split_att = attributes[0]
-#     split_att_ent = 500
-#     for att in attributes:
-#         index = header.index(att)
-#         labels = []
-#         labels_indexes = []
-#         total_ent = 0
-#         for i, instance in enumerate(instances):
-#             if instance[index] not in labels:
-#                 labels.append(instance[index])
-#                 labels_indexes.append([i])
-#             else:
-#                 i_labels = labels.index(instance[index])
-#                 labels_indexes[i_labels].append(i)
-#         for label_indexes in labels_indexes:
-#             class_labels = []
-#             class_freq = []
-#             for elem_index in label_indexes:
-#                 if instances[elem_index][-1] not in class_labels:
-#                     class_labels.append(instances[elem_index][-1])
-#                     class_freq.append(1)
-#                 else:
-#                     idx = class_labels.index(instances[elem_index][-1])
-#                     class_freq[idx] += 1
-#             sums = 0
-#             for label_idx, class_label in enumerate(class_labels):
-#                 val = class_freq[label_idx]/len(label_indexes)
-#                 sums += (-val) * (math.log2(val))
-#             total_ent += (len(label_indexes) / len(X_train)) * sums
-#         if total_ent < split_att_ent:
-#             split_att_ent = total_ent
-#             split_att = att
-#     return split_att
-
-
-# def partition_instances(instances, split_atribute, header, attribute_domains):
-#     """group the instances together
-#         Args:
-#             instances (list of list of str/int) : represent the instances in this split
-#             split_attribute(str): attribute to group instances
-#             header (list of str): header of the table
-#             attribute_domains (list of str): attribute domains of that attrubute
-#         partitions (dictionary): attribute domain as key and instances as values
-#      """
-#     # lets use a dictionary
-#     partitions = {}  # key string mapping to subvalue pairs
-#     att_index = header.index(split_atribute)  # e.g: 0 for level
-#     # e.g: ["Junior","Mid","Senior"]
-#     att_domain = attribute_domains[split_atribute]
-#     for att_val in att_domain:
-#         partitions[att_val] = []
-#         for instance in instances:
-#             if instance[att_index] == att_val:
-#                 partitions[att_val].append(instance)
-
-#     return partitions
-
-
-# def majority_node(instances):
-#     """the class value that most instances have
-#         Args:
-#             instances (list of list of str/int) : represent the instances in this split
-#         Returns:
-#             label(str): most occuring/frequent class label of the instances
-#     """
-#     labels = []
-#     freqs = []
-#     for instance in instances:
-#         if instance[-1] not in labels:
-#             labels.append(instance[-1])
-#             freqs.append(1)
-#         else:
-#             i = labels.index(instance[-1])
-#             freqs[i] += 1
-#     min = 100
-#     min_index = -1
-#     for i, freq in enumerate(freqs):
-#         if freq < min:
-#             min = freq
-#             min_index = i
-#         elif freq == min:
-#             if labels[min_index] > labels[i]:
-#                 min_index = i
-#     return labels[min_index]
-
-
-# def get_attribute_domains(header, table):
-#     """returns the attribute domains in each attribute in alphabetical order
-#         Args:
-#             table (list of list of str/int) : represent the whole dataset table
-#             header (list of str): header of the table
-#         Returns:
-#             dict_domains(dictionary): list of attributes as keys and and its domains as values
-#     """
-#     dict_domains = {}
-#     arr_vals = []
-#     for i, elem in enumerate(header):
-#         arr_vals = []
-#         for row in table:
-#             if row[i] not in arr_vals:
-#                 arr_vals.append(row[i])
-#         arr_vals.sort()
-#         dict_domains.update({elem: arr_vals})
-
-#     return dict_domains
-
-
-# def tdidt(current_instances, available_attributes, header, attribute_domains, X_train):
-#     """responsible for fitting the dataset into a tree using the tdidt algorithmn, will decide how to split into a tree
-#         Args:
-#             current_instances (list of list of str/int) : represent the instances in this split
-#             available_attributes (list of str): attributes that can still be split on
-#             header (list of str): header of the table
-#             attribute_domains (dictionary): attribute domains for all the attributes
-#             X_train (list of list of str/int): represent the orignal X dataset
-#         Returns:
-#             tree(N-D array of list or int): tree represented in nested lists
-#     """
-#     # basic approach (uses recursion!!):
-#     # select an attribute to split on
-#     attribute = select_attribute(
-#         current_instances, available_attributes, header, X_train)
-#     #print("split on:",attribute)
-#     # remove split att
-#     available_attributes.remove(attribute)
-#     tree = ["Attribute", attribute]
-#     # group data by attribute domains (creates pairwise disjoint partitions)
-#     partition = partition_instances(
-#         current_instances, attribute, header, attribute_domains)
-#     # for each partition, repeat unless one of the following occurs (base case)
-#     for att_val, att_partition in partition.items():
-#         value_subtree = ["Value", att_val]
-#     #   CASE 1: all class labels of the partition are the same => make a leaf node
-#         if len(att_partition) > 0 and all_same_class(att_partition):
-#             #print("CASE 1, ALL SAME CATEGORIES")
-#             node = ["Leaf", att_partition[0][-1],
-#                     len(att_partition), len(current_instances)]
-#             value_subtree.append(node)
-#             tree.append(value_subtree)
-#         #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
-#         elif len(att_partition) > 0 and len(available_attributes) == 0:
-#             #print("CASE 2, NO MORE ATT")
-#             node_val = majority_node(att_partition)
-#             node = ["Leaf", node_val, len(
-#                 att_partition), len(current_instances)]
-#             value_subtree.append(node)
-#             tree.append(value_subtree)
-#         #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
-#         elif len(att_partition) == 0:
-#             #print("CASE 3 empty partition")
-#             return None
-#         else:
-#             subtree = tdidt(att_partition, available_attributes.copy(
-#             ), header, attribute_domains, X_train)
-#             if subtree is None:
-#                 val = 0
-#                 node_val = majority_node(att_partition)
-#                 for rows in att_partition:
-#                     if rows[-1] == node_val:
-#                         val += 1
-#                 subtree = ["Leaf", node_val, len(
-#                     att_partition), len(current_instances)]
-#             value_subtree.append(subtree)
-#             tree.append(value_subtree)
-#     return tree
-
-
-# def all_same_class(att_partition):
-#     """checks if the istances have same class label
-#         Args:
-#             att_partition (list of list of str/int) : represent the instances in this split
-#         Returns:
-#             boolean of True or False, True means all same, false otherwise
-# d
-#         """
-#     label = None
-#     for partition in att_partition:
-#         if label is None:
-#             label = partition[-1]
-#         else:
-#             if label != partition[-1]:
-#                 return False
-#     return True
-
-
 # def recurse_tree(x_val, att_val, tree, header):
 #     """recurse the tree
 #         Args:
@@ -451,21 +254,42 @@ def bonus_graphviz(tree, depth, labels, outfile, value=None, prev_att=None):
 #     return True
 
 
-# def find_max(label, freqs):
-#     """ find max finds the label associated with the highest frequency given a list of frequencies
-#         Args:
-#             label(list of str): list of labels
-#             freqs(list of int): frequency of each label(parallel to labels)
-#         Returns:
-#             max_label(str): label of the highest frequency
-#     """
-#     max_f = 0
-#     max_label = ""
-#     for i, freq in enumerate(freqs):
-#         if freq > max_f:
-#             max_f = freq
-#             max_label = label[i]
-#     return max_label
+def find_max(label, freqs):
+    """ find max finds the label associated with the highest frequency given a list of frequencies
+        Args:
+            label(list of str): list of labels
+            freqs(list of int): frequency of each label(parallel to labels)
+        Returns:
+            max_label(str): label of the highest frequency
+    """
+    max_f = 0
+    max_label = ""
+    for i, freq in enumerate(freqs):
+        if freq > max_f:
+            max_f = freq
+            max_label = label[i]
+    return max_label
+
+
+def compute_bootstrapped_sample(table):
+    n = len(table)
+    train_set = []
+    for _ in range(n):
+        # Return random integers from low (inclusive) to high (exclusive)
+        rand_index = np.random.randint(0, n)
+        train_set.append(table[rand_index])
+
+    validation_set = []
+    for i in range(n):
+        if table[i] not in train_set:
+            validation_set.append(table[i])
+
+    X_train = [row[0:-1] for row in train_set]
+    y_train = [row[-1] for row in train_set]
+    X_test = [row[0:-1] for row in validation_set]
+    y_test = [[row[-1]] for row in validation_set]
+
+    return X_train, y_train, X_test, y_test
 
 
 def compute_random_subset(header, f):
@@ -473,6 +297,26 @@ def compute_random_subset(header, f):
     values_copy = header[:]  # shallow copy
     np.random.shuffle(values_copy)  # in place shuffle
     return values_copy[:f]
+
+
+def find_majority(index, table):
+    unique_instances = []
+    for row in table:
+        if row[index] not in unique_instances:
+            unique_instances.append(row[index])
+
+    count_instances = [[] for _ in unique_instances]
+
+    for row in table:
+        count_instances[unique_instances.index(row[index])].append(1)
+
+    sum_instances = []
+    for row in count_instances:
+        sum_instances.append(sum(row))
+
+    majority_vote = unique_instances[sum_instances.index(max(sum_instances))]
+
+    return majority_vote
 
 
 def select_attribute(instances, attributes):
