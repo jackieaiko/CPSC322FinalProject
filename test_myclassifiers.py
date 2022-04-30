@@ -39,8 +39,9 @@ def test_kneighbors_classifier_kneighbors():
     function_kneighbor.fit(X_train_class_example1, y_train_class_example1)
     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-    assert np.allclose(func_dist, test_distances)
-    assert np.allclose(funct_indices, test_neighbor_indices)
+    for i,test_distance in enumerate(test_distances):
+        assert np.isclose(round(func_dist[0][i],2), test_distance)
+        assert np.isclose(round(funct_indices[0][i],2), test_neighbor_indices[i])
 
     X_test = [[2, 3]]
     test_distances = [1.41, 1.41, 2.00]
@@ -49,8 +50,9 @@ def test_kneighbors_classifier_kneighbors():
     function_kneighbor.fit(X_train_class_example2, y_train_class_example2)
     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-    assert np.allclose(func_dist, test_distances)
-    assert np.allclose(funct_indices, test_neighbor_indices)
+    for i,test_distance in enumerate(test_distances):
+        assert np.isclose(round(func_dist[0][i],2), test_distance)
+        assert np.isclose(round(funct_indices[0][i],2), test_neighbor_indices[i])
 
 
 def test_kneighbors_classifier_predict():

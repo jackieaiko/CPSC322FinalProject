@@ -146,6 +146,7 @@ class MyKNeighborsClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         y_predicted = []
+        print("xtest",X_test)
         res = self.kneighbors(X_test)
         for indices in res[1]:
             class_label = []
@@ -161,7 +162,7 @@ class MyKNeighborsClassifier:
                     class_freq[idx] += 1
             max_freq_label = myutils.find_max(class_label, class_freq)
             y_predicted.append([max_freq_label])
-
+        print(y_predicted)
         return y_predicted
         """
         distances, neighbor_indices = self.kneighbors(X_test)
