@@ -1,6 +1,7 @@
 """myclassifiers.py
 """
 from dis import dis
+from math import remainder
 import operator
 import os
 from mysklearn import myutils
@@ -146,7 +147,6 @@ class MyKNeighborsClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         y_predicted = []
-        print("xtest",X_test)
         res = self.kneighbors(X_test)
         for indices in res[1]:
             class_label = []
@@ -162,7 +162,6 @@ class MyKNeighborsClassifier:
                     class_freq[idx] += 1
             max_freq_label = myutils.find_max(class_label, class_freq)
             y_predicted.append([max_freq_label])
-        print(y_predicted)
         return y_predicted
         """
         distances, neighbor_indices = self.kneighbors(X_test)
@@ -399,7 +398,7 @@ class MyDecisionTreeClassifier:
         y_predicted = []
         for instance in X_test:
             predicted = myutils.tdidt_predict(header, self.tree, instance)
-            y_predicted.append(predicted)
+            y_predicted.append([predicted])
 
         return y_predicted
 
@@ -458,15 +457,12 @@ class MyRandomForestClassifier:
     def __init__(self, n, m, f):
         """Initializer for MyDecisionTreeClassifier.
         """
-        self.remainder_set = None
-        self.test_set = None
         self.m_forest = None
-
         self.n = n
         self.m = m
         self.f = f
 
-    def fit(self, remainder_set, test_set):
+    def fit(self, X_train, y_train):
         """Fits a decision random forest classifier 
         Args:
             X(list of list of obj): The list of training instances (samples).
@@ -475,22 +471,19 @@ class MyRandomForestClassifier:
                 The shape of y_train is n_train_samples
         """
 
-        self.remainder_set = remainder_set
-        self.test_set = test_set
-
         n_forest = []
         n_performance = []
+        table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         for _ in range(self.n):
-            X_train, y_train, X_test, y_test = myutils.compute_bootstrapped_sample(
-                remainder_set)
-
+            X_train, y_train, X_validate, y_validate = myutils.compute_bootstrapped_sample(table)
+            
             decision_tree_classifier = MyDecisionTreeClassifier()
             decision_tree_classifier.fit(X_train, y_train, self.f)
 
-            y_predicted = decision_tree_classifier.predict(X_test)
-            accuracy_score = myevaluation.accuracy_score(y_test, y_predicted)
+            y_predicted = decision_tree_classifier.predict(X_validate)
+            accuracy_score = myevaluation.accuracy_score(y_validate, y_predicted)
 
-            n_forest.append(decision_tree_classifier.tree)
+            n_forest.append(decision_tree_classifier)
             n_performance.append(accuracy_score)
 
         # find largest values
@@ -499,22 +492,22 @@ class MyRandomForestClassifier:
 
         self.m_forest = [n_forest[i] for i in largest_indices]
 
-    def predict(self):
+    def predict(self,X_tests):
         """Makes predictions for test instances in test_set.
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         header = []
-        for header_len in range(len(self.test_set[0])):
+        for header_len in range(len(X_tests[0])):
             header.append("att" + str(header_len))
 
         # get predicted instances for each tree
         all_predicted = []
         for tree in self.m_forest:
             y_predicted = []
-            for instance in self.test_set:
-                predicted = myutils.tdidt_predict(header, tree, instance)
-                y_predicted.append(predicted)
+            all_predicted_tests = tree.predict(X_tests)
+            for predicted in all_predicted_tests:
+                y_predicted.append(predicted[0])
             all_predicted.append(y_predicted)
 
         # find majority for each column

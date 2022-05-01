@@ -283,14 +283,9 @@ def test_decision_tree_classifier_predict():
 
 
 def test_random_forest_fit():
-    X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
-        X_train_interview, y_train_interview)
-    test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
-    remainder_set = [X_train1[i] + [y_train1[i]]
-                     for i in range(len(X_train1))]
-
+    
     random_forest = MyRandomForestClassifier(5, 2, 3)
-    random_forest.fit(remainder_set, test_set)
+    random_forest.fit(X_train_interview,y_train_interview)
 
     assert 5 == random_forest.n
     assert 2 == random_forest.m
@@ -298,14 +293,10 @@ def test_random_forest_fit():
 
 
 def test_random_forest_predict():
-    X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
-        X_train_interview, y_train_interview)
-    test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
-    remainder_set = [X_train1[i] + [y_train1[i]]
-                     for i in range(len(X_train1))]
-
     random_forest = MyRandomForestClassifier(5, 2, 3)
-    random_forest.fit(remainder_set, test_set)
+    random_forest.fit(X_train_interview,y_train_interview)
+    X_test = [["Junior", "Java", "yes", "no"],
+              ["Junior", "Java", "yes", "yes"]]
 
-    y_predicted = random_forest.predict()
-    assert 5 == len(y_predicted)
+    y_predicted = random_forest.predict(X_test)
+    assert 2 == len(y_predicted)

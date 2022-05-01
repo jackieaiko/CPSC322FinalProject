@@ -47,21 +47,11 @@ for header in headers_to_remove:
 
 y_data = myutils.get_column(survey_table.data,survey_table.column_names,"mental_health_consequence")
 survey_table.data, survey_table.column_names = myutils.remove_column(survey_table.data,survey_table.column_names, "mental_health_consequence")
-X_train1, X_test1, y_train1, y_test1 = myevaluation.train_test_split(
-    survey_table.data, y_data)
-test_set = [X_test1[i] + [y_test1[i]] for i in range(len(X_test1))]
-remainder_set = [X_train1[i] + [y_train1[i]]
-                 for i in range(len(X_train1))]
-
+print(survey_table.data[0])
 random_forest = MyRandomForestClassifier(40, 30, 9)
-random_forest.fit(remainder_set, test_set)
+random_forest.fit(survey_table.data,y_data)
 
 # serialize to file (pickle)
 outfile = open("forest.p", "wb")
 pickle.dump(random_forest, outfile)
 outfile.close()
-
-# deserialize to object (unpickle)
-infile = open("forest.p", "rb")
-forest_obj = pickle.load(infile)
-infile.close()

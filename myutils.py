@@ -156,9 +156,6 @@ def parameterized_classifiers(train_folds, test_folds, n_splits, survey_table, y
         all_y_test += y_test
 
     if classifier_name == "Decision Tree Classifier":
-        all_X_train.insert(0, survey_table.column_names)
-        all_y_train.insert(0, "mental health consequence")
-
         classifier_idx = classifier_names.index(classifier_name)
         classifier = classifier_obj[classifier_idx]
         classifier.fit(all_X_train, all_y_train, f)
