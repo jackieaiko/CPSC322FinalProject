@@ -20,14 +20,16 @@ def index_page():
         leave = request.form["leave"]
         phys_conseq = request.form["phys_health_consequence"]
         coworkers = request.form["coworkers"]
-        supervisor = request.args["supervisor"]
+        supervisor = request.form["supervisor"]
         mental_health_int = request.form["mental_health_interview"]
         mental_vs_pyhs = request.form["mental_vs_physical"]
         obs_conseq = request.form["obs_consequence"]
         prediction = predict_random_forest([treatment,company,wellness_prog,help,anonymity,leave,phys_conseq,coworkers,supervisor,mental_health_int,mental_vs_pyhs,obs_conseq])
-    print("prediction:", prediction)
+        print("prediction:", prediction)
+        return render_template("success.html",prediction=prediction)
     # goes into templates folder and finds given name
-    return render_template("index.html", prediction=prediction) 
+    else:
+        return render_template("index.html", prediction=prediction) 
 
 @app.route('/predict', methods=["GET"])
 def predict():
