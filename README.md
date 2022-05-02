@@ -18,3 +18,6 @@ Throughout the technical report, there are printed out results such as charts an
 
 ## Conclusion
 To learn more about the implications of these findings, read the conclusion found in the technical report. This summarizes the classification approach we used and the performance results dervied from it. We also reflect on these findings and how it could be improved in the future.
+
+## Link to Heroku deployement:
+https://cpsc322final.herokuapp.com/
