@@ -10,9 +10,13 @@ import csv
 import math
 import numpy as np
 
+<<<<<<< HEAD
 np.random.seed(7)
 
 
+=======
+np.random.seed(4)
+>>>>>>> 78d5e5ba536a08f67d1e73815cf58e27fe7959fa
 def compute_euclidean_distance(v1, v2):
     """computes the distance of v1 and v2 at each instance
 

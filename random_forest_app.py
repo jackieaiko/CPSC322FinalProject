@@ -50,23 +50,23 @@ def predict():
     if prediction is not None:
         # success!
         result = {"prediction": prediction}
-        return jsonify(result), 200
+        return render_template("success.html",prediction=prediction)
     else:
         return "Error making prediction", 400
 
-def predict_forest(random_forest,instance):
+def predict_forest(knn_classifier,instance):
     test = ['Yes', 'Yes', 'No', 'Yes', 'Yes', 'Somewhat easy', 'No', 'Some of them', 'Yes', 'No', 'Yes', 'No']
     X_test = [instance]
-    prediction = random_forest.predict(X_test)
-    return prediction[0]
+    prediction = knn_classifier.predict(X_test)
+    return prediction[0][0]
 
 def predict_random_forest(unseen_instance):
     # deserialize to object (unpickle)
-    infile = open("forest.p", "rb")
-    random_forest = pickle.load(infile)
+    infile = open("knn.p", "rb")
+    knn_classifier = pickle.load(infile)
     infile.close()
     try:
-        return predict_forest(random_forest, unseen_instance)
+        return predict_forest(knn_classifier, unseen_instance)
     except:
         return None
 
