@@ -5,7 +5,7 @@ from mypytable import MyPyTable
 import myutils
 from copy import deepcopy
 import os
-from mysklearn.myclassifiers import MyRandomForestClassifier
+from mysklearn.myclassifiers import MyKNeighborsClassifier, MyRandomForestClassifier
 import mysklearn.myevaluation as myevaluation
 
 survey_fname = os.path.join("input_data","survey.csv")
@@ -47,11 +47,10 @@ for header in headers_to_remove:
 
 y_data = myutils.get_column(survey_table.data,survey_table.column_names,"mental_health_consequence")
 survey_table.data, survey_table.column_names = myutils.remove_column(survey_table.data,survey_table.column_names, "mental_health_consequence")
-print(survey_table.data[0])
-random_forest = MyRandomForestClassifier(40, 30, 9)
-random_forest.fit(survey_table.data,y_data)
+knn_classifier = MyKNeighborsClassifier()
+knn_classifier.fit(survey_table.data,y_data)
 
 # serialize to file (pickle)
-outfile = open("forest.p", "wb")
-pickle.dump(random_forest, outfile)
+outfile = open("knn.p", "wb")
+pickle.dump(knn_classifier, outfile)
 outfile.close()
