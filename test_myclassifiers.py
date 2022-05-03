@@ -39,9 +39,10 @@ def test_kneighbors_classifier_kneighbors():
     function_kneighbor.fit(X_train_class_example1, y_train_class_example1)
     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-    for i,test_distance in enumerate(test_distances):
-        assert np.isclose(round(func_dist[0][i],2), test_distance)
-        assert np.isclose(round(funct_indices[0][i],2), test_neighbor_indices[i])
+    for i, test_distance in enumerate(test_distances):
+        assert np.isclose(round(func_dist[0][i], 2), test_distance)
+        assert np.isclose(
+            round(funct_indices[0][i], 2), test_neighbor_indices[i])
 
     X_test = [[2, 3]]
     test_distances = [1.41, 1.41, 2.00]
@@ -50,9 +51,10 @@ def test_kneighbors_classifier_kneighbors():
     function_kneighbor.fit(X_train_class_example2, y_train_class_example2)
     func_dist, funct_indices = function_kneighbor.kneighbors(X_test)
 
-    for i,test_distance in enumerate(test_distances):
-        assert np.isclose(round(func_dist[0][i],2), test_distance)
-        assert np.isclose(round(funct_indices[0][i],2), test_neighbor_indices[i])
+    for i, test_distance in enumerate(test_distances):
+        assert np.isclose(round(func_dist[0][i], 2), test_distance)
+        assert np.isclose(
+            round(funct_indices[0][i], 2), test_neighbor_indices[i])
 
 
 def test_kneighbors_classifier_predict():
@@ -277,26 +279,69 @@ def test_decision_tree_classifier_predict():
                       len(y_train_interview))
     X_test = [["Junior", "Java", "yes", "no"],
               ["Junior", "Java", "yes", "yes"]]
-    expected_predict = ["True", "False"]
+    expected_predict = [["True"], ["False"]]
     predicted = decision_tree.predict(X_test)
     assert expected_predict == predicted
 
 
 def test_random_forest_fit():
-    
-    random_forest = MyRandomForestClassifier(5, 2, 3)
-    random_forest.fit(X_train_interview,y_train_interview)
+    np.random.seed(0)
+    random_forest = MyRandomForestClassifier(3, 2, 3)
+    random_forest.fit(X_train_interview, y_train_interview)
 
-    assert 5 == random_forest.n
-    assert 2 == random_forest.m
-    assert 3 == random_forest.f
+    expected_m_tree = [['Attribute', 'att1',
+                        ['Value', 'Java',
+                         ['Leaf', 'False', 4, 14]],
+                        ['Value', 'Python',
+                         ['Attribute', 'att0',
+                          ['Value', 'Senior',
+                           ['Leaf', 'False', 1, 9]],
+                          ['Value', 'Mid',
+                           ['Leaf', 'True', 1, 9]],
+                          ['Value', 'Junior',
+                           ['Attribute', 'att2',
+                                    ['Value', 'no',
+                                        ['Leaf', 'False', 5, 7]],
+                                    ['Value', 'yes',
+                                        ['Leaf', 'True', 2, 7]]]]]],
+                        ['Value', 'R',
+                         ['Leaf', 'True', 1, 14]]],
+
+                       ['Attribute', 'att1',
+                        ['Value', 'Java',
+                         ['Attribute', 'att2',
+                          ['Value', 'yes',
+                           ['Leaf', 'True', 1, 2]],
+                          ['Value', 'no',
+                           ['Leaf', 'False', 1, 2]]]],
+                        ['Value', 'R',
+                            ['Attribute', 'att3',
+                             ['Value', 'no',
+                              ['Leaf', 'True', 1, 4]],
+                             ['Value', 'yes',
+                              ['Leaf', 'True', 3, 4]]]],
+                        ['Value', 'Python',
+                            ['Attribute', 'att2',
+                             ['Value', 'yes',
+                              ['Leaf', 'True', 1, 8]],
+                             ['Value', 'no',
+                              ['Attribute', 'att3',
+                               ['Value', 'no',
+                                ['Leaf', 'False', 6, 7]],
+                               ['Value', 'yes',
+                                ['Leaf', 'True', 1, 7]]]]]]]]
+
+    assert expected_m_tree == random_forest.m_forest_vis
 
 
 def test_random_forest_predict():
-    random_forest = MyRandomForestClassifier(5, 2, 3)
-    random_forest.fit(X_train_interview,y_train_interview)
+    np.random.seed(0)
+    random_forest = MyRandomForestClassifier(3, 2, 3)
+    random_forest.fit(X_train_interview, y_train_interview)
+
     X_test = [["Junior", "Java", "yes", "no"],
               ["Junior", "Java", "yes", "yes"]]
 
+    expected_predict = ['False', 'False']
     y_predicted = random_forest.predict(X_test)
-    assert 2 == len(y_predicted)
+    assert expected_predict == y_predicted

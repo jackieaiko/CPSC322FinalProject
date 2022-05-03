@@ -257,14 +257,3 @@ def bar_chart(data1, data2, title_name, x_name, y_name):
     plt.xlabel(x_name)
     plt.ylabel(y_name)
     plt.show()
-
-
-def multi_bar_chart(X_labels, y_vals, y_lables):
-    X_axis = np.arange(len(X_labels))
-    for i, y_val in enumerate(y_vals):
-        genere_sales = y_val
-        position = X_axis + 0.20 * i
-        plt.bar(position, genere_sales, width=0.2, label=y_lables[i])
-    plt.xticks(X_axis, X_labels, rotation=75, ha="right")
-    plt.legend()
-    plt.show()

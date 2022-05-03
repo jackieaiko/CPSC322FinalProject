@@ -11,6 +11,8 @@ import math
 import numpy as np
 
 np.random.seed(7)
+
+
 def compute_euclidean_distance(v1, v2):
     """computes the distance of v1 and v2 at each instance
 
@@ -131,36 +133,6 @@ def find1_column(X_train, col_index):
     return col
 
 
-# def recurse_tree(x_val, att_val, tree, header):
-#     """recurse the tree
-#         Args:
-#             x_val (list of str/int) : the instance to recurse on/predict
-#             att_val (str): attribute value
-#             header (list of str): header of the table
-#             tree (ND-array): tree represented in nested list
-#         Returns:
-#             prediction(str): class label
-#         """
-#     prediction = ""
-#     # base case:
-#     if tree[0] == "Value" and tree[1] == att_val and tree[2][0] != "Attribute":
-#         for i in range(2, len(tree)):
-#             if tree[i][0] == "Leaf":
-#                 prediction = tree[i][1]
-#                 return prediction
-#     else:
-#         if att_val != "":
-#             tree = tree[2]
-#         if tree[0] == "Attribute":
-#             print("hedaer ere",header,"tree_i",tree[1])
-#             index = header.index(tree[1])
-#             att_val = x_val[index]
-#             for i in range(2, len(tree)):
-#                 if tree[i][1] == att_val:
-    #                 prediction = recurse_tree(x_val, att_val, tree[i], header)
-    # return prediction
-
-
 def print_tree(tree, depth, rule_str, class_name):
     """print the tree
         Args:
@@ -230,30 +202,6 @@ def bonus_graphviz(tree, depth, labels, outfile, value=None, prev_att=None):
                            outfile, tree[i][1], box_name)
 
 
-# def equal_trees(tree1, tree2):
-#     """recursively check is both trees are equal
-#         Args:
-#             tree1 (ND-array): tree 1 represented in nested list
-#             tree2 (ND-array): tree 2 represented in nested list
-#     """
-#     if tree2[0] == "Leaf":
-#         if tree2[1] != tree1[1] or tree2[2] != tree1[2] or tree2[3] != tree1[3]:
-#             return False
-#         return True
-#     else:
-#         if tree2[0] == "Attribute":
-#             if tree2[1] != tree1[1]:
-#                 return False
-#             for i in range(2, len(tree2)):
-#                 if tree2[i] != tree1[i]:
-#                     return False
-#                 else:
-#                     is_true = equal_trees(tree1[i][2], tree2[i][2])
-#                     if is_true is False:
-#                         return False
-#     return True
-
-
 def find_max(label, freqs):
     """ find max finds the label associated with the highest frequency given a list of frequencies
         Args:
@@ -272,6 +220,14 @@ def find_max(label, freqs):
 
 
 def compute_bootstrapped_sample(table):
+    """selects the attribute index to partition on
+
+    Args:
+        table: remainder set 
+
+    Returns:
+       X_train, y_train, X_test, y_test: split
+    """
     n = len(table)
     train_set = []
     for _ in range(n):
@@ -293,6 +249,15 @@ def compute_bootstrapped_sample(table):
 
 
 def compute_random_subset(header, f):
+    """used for holdout method selection
+
+    Args:
+        header: column names
+        f: num att for tree
+
+    Returns:
+       values_copy[:f]: shuffled list
+    """
     # there is a function np.random.choice()
     values_copy = header[:]  # shallow copy
     np.random.shuffle(values_copy)  # in place shuffle
@@ -300,6 +265,15 @@ def compute_random_subset(header, f):
 
 
 def find_majority(index, table):
+    """finds majority instance
+
+    Args:
+        index: column index
+        table: instance
+
+    Returns:
+       majority_vote: majority instance
+    """
     unique_instances = []
     for row in table:
         if row[index] not in unique_instances:

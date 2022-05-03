@@ -461,6 +461,7 @@ class MyRandomForestClassifier:
         self.n = n
         self.m = m
         self.f = f
+        self.m_forest_vis = None
 
     def fit(self, X_train, y_train):
         """Fits a decision random forest classifier 
@@ -470,19 +471,22 @@ class MyRandomForestClassifier:
             y(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
         """
-
+        n_forest_vis = []
         n_forest = []
         n_performance = []
         table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         for _ in range(self.n):
-            X_train, y_train, X_validate, y_validate = myutils.compute_bootstrapped_sample(table)
-            
+            X_train, y_train, X_validate, y_validate = myutils.compute_bootstrapped_sample(
+                table)
+
             decision_tree_classifier = MyDecisionTreeClassifier()
             decision_tree_classifier.fit(X_train, y_train, self.f)
 
             y_predicted = decision_tree_classifier.predict(X_validate)
-            accuracy_score = myevaluation.accuracy_score(y_validate, y_predicted)
+            accuracy_score = myevaluation.accuracy_score(
+                y_validate, y_predicted)
 
+            n_forest_vis.append(decision_tree_classifier.tree)
             n_forest.append(decision_tree_classifier)
             n_performance.append(accuracy_score)
 
@@ -491,8 +495,9 @@ class MyRandomForestClassifier:
                                  key=lambda i: n_performance[i])[-self.m:]
 
         self.m_forest = [n_forest[i] for i in largest_indices]
+        self.m_forest_vis = [n_forest_vis[i] for i in largest_indices]
 
-    def predict(self,X_tests):
+    def predict(self, X_tests):
         """Makes predictions for test instances in test_set.
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
